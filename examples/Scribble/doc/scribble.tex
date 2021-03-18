@@ -1,0 +1,310 @@
+\documentclass[12pt,a4paper,german]{article}
+\usepackage{babel}
+\usepackage{colortbl}
+\usepackage{times}
+\usepackage{fancybox}
+\usepackage{fancyhdr}
+\usepackage[latin1]{inputenc}
+\usepackage{ktsi}
+\usepackage{graphicx}
+\usepackage{alltt}
+\usepackage{pifont}
+\newcommand{\OK}{\ding{52}}
+%
+\newenvironment{Boxedminipage}%
+  {\begin{Sbox}\begin{minipage}}
+  {\end{minipage}\end{Sbox}\shadowbox{\TheSbox}}
+\setlength{\headheight}{-4cm}
+\addtolength{\textwidth}{2cm}
+\addtolength{\textheight}{65.cm}
+\setlength{\oddsidemargin}{-0.5cm}
+\setlength{\evensidemargin}{0pt}
+\usepackage{keywords}
+%\usepackage[bookmarks]{hyperref}
+\begin{document}
+\section*{Zeichnungsprogramm}
+Es soll ein Programm zur interaktiven Erstellung von einfachen Zeichnungen entwickelt werden.
+Das Programm soll nach dem Aufstarten 
+ein leeres Fenster anzeigen, in welchem der Benutzer
+durch Verschieben des Mauszeigers
+bei gedr\"uckter Maustaste Linienz\"uge erzeugen kann, die 
+in bestimmter Strichdicke und Farbe unmittelbar der Bewegung des 
+Mauszeigers folgend angezeigt werden.
+\subsection*{Bestimmung der Klassen}
+Textanalyse (Substantive):\\[2ex]
+\begin{tabular}{llcll}
+          & englisch & Verwendung & MFC-Basisklasse & Qt-Basisklasse \\
+\hline
+ Programm & Application & \OK & CWinApp & \\
+ Erstellung & Creation &    & & \\
+ Zeichnung & Drawing, Document &  \OK & (CDocument) & \\
+ Aufstarten & Start-up & & & \\
+ Fenster & Window, View & \OK & CFrameWnd & QWindow \\
+ Zeichenfläche & DrawWindow & \OK & \\
+ Verschieben & Move &  & \\
+ Mauszeiger & Mouse pointer & &\\
+ Maustaste & Mouse button & &\\
+ Benutzer & User &         & \\
+ Linienzug & Line stroke & \OK &\\
+ Bewegung & Move & & \\[4ex]
+\end{tabular}
+\subsection*{Klassendiagramm}
+\includegraphics[width=\linewidth]{xfig/zchclass-diag}
+\newpage
+\subsection*{Sequenzdiagramm}
+\includegraphics[width=\linewidth]{xfig/zchseq-diag}
+%\subsection*{Sequenzdiagramm}
+\large
+\begin{alltt}
+// ScribbleApp.h
+#if !defined( SCRIBBLEAPP_H )
+#define SCRIBBLEAPP_H
+
+#include <afxwin.h>
+
+\CLASS ScribbleApp: \PUBLIC CWinApp \{
+\PUBLIC:
+  ScribbleApp();
+  \VIRTUAL BOOL InitInstance();
+\};
+#endif
+\newpage
+// DrawWindow.h
+#if !defined(DRAWWINDOW_H)
+#define DRAWWINDOW_H
+
+#include <afxwin.h>
+#include "Document.h"
+
+\CLASS DrawWindow : \PUBLIC CFrameWnd \{
+\PUBLIC:
+   // {\em Constructor}
+   DrawWindow();
+   // {\em Destructor}
+   \VIRTUAL ~DrawWindow();
+
+   // constructs a frame window directly
+   \INT create( LPCTSTR lpszWindowName );
+   \VIRTUAL \VOID OnPaint();
+
+\PROTECTED:
+   \VOID OnLButtonDown( UINT nFlags, CPoint p );
+   \VOID OnLButtonUp( UINT nFlags, CPoint p );
+   \VOID OnMouseMove( UINT nFlags, CPoint p );
+
+   DECLARE_MESSAGE_MAP()
+
+\PRIVATE:
+   Document m_document;
+\};
+#endif
+\newpage
+// Document.h: interface for the Document class.
+#if !defined(DOCUMENT_H)
+#define DOCUMENT_H
+
+#include "Stroke.h"
+#include <vector>
+
+\CLASS Document\{
+\PUBLIC:
+  Document();
+  \VIRTUAL ~Document();
+  // {\em adds a new stroke}
+  \VOID newStroke();
+  // {\em adds a point to the last stroke}
+  \VOID add( \CONST CPoint &p );
+  /// {\em draws all strokes}
+  \VOID draw( CDC *dc ) \CONST;
+  /// {\em draws the connecting line between the last two points}
+  \VOID drawLast( CDC *dc ) \CONST;
+
+\PRIVATE:
+  \TYPEDEF std::vector< Stroke > StrokeVector;
+  StrokeVector m_strokes;
+\};
+#endif
+\newpage 
+// {\em Stroke.h: interface for the Stroke class.}
+#if !defined(STROKE_H)
+#define STROKE_H
+
+#include <afxwin.h>
+#include <vector>
+
+\CLASS Stroke \{
+\PUBLIC:
+   Stroke(\UNSIGNED \SHORT nPenWidth=2, \INT color=0 );
+   // {\em Copy constructor}
+   Stroke( \CONST Stroke& s);
+   \VIRTUAL ~Stroke();
+   // {\em adds a new point}
+   \VOID add( \CONST CPoint &p );
+   // {\em draws the complete stroke}
+   \VOID draw( CDC *pdc ) \CONST;
+   // {\em draws the connection between the last two points}
+   \VOID drawLast( CDC *pdc ) \CONST;
+
+\PRIVATE:
+   \TYPEDEF std::vector< CPoint > PointVector;
+   PointVector m_points;
+   \INT m_penWidth;
+   \INT m_color;
+\};
+#endif 
+\end{alltt}
+\newpage
+\begin{alltt}
+// ScribbleApp.cpp: 
+// \mbox  {\em Defines the class behavors for the application }
+
+#include "ScribbleApp.h"
+#include "DrawWindow.h"
+
+// Global object
+ScribbleApp theApp;
+
+// Constructor
+ScribbleApp::ScribbleApp()\{
+   // empty
+\}
+
+// Initialialization
+BOOL ScribbleApp::InitInstance()\{
+   DrawWindow *mw = new DrawWindow;
+   m_pMainWnd = mw;
+
+//{\em initializes the window's class name and window name }
+//{\em and registers default values for its style, parent}
+//{\em and associated menu.}
+
+   mw -> Create( "Scribble" ); 
+
+   mw -> ShowWindow(m_nCmdShow);
+   mw ->UpdateWindow();
+   \RETURN TRUE;
+\}
+\newpage
+// {\em DrawWindow.cpp: implementation of the DrawWindow class.}
+#include "DrawWindow.h"
+#include "Stroke.h"
+
+BEGIN_MESSAGE_MAP( DrawWindow, CFrameWnd )
+   ON_WM_CREATE()
+   ON_WM_LBUTTONDOWN()
+   ON_WM_LBUTTONUP()
+   ON_WM_MOUSEMOVE()
+   ON_WM_PAINT()
+END_MESSAGE_MAP()
+
+DrawWindow::DrawWindow()\{ // {\em empty} \}
+
+DrawWindow::~DrawWindow()\{  // {\em empty} \}
+
+\INT DrawWindow::create( LPCTSTR lpszWindowName )\{
+   \RETURN CFrameWnd::Create(0, lpszWindowName );
+\}
+
+\VOID DrawWindow::OnPaint( )\{
+   CClientDC dc( \THIS );
+   m_document.draw(&dc);
+\}
+
+\VOID DrawWindow::OnLButtonDown( UINT, CPoint p )\{
+   m_document.newStroke( );
+   m_document.add(p);
+   SetCapture();  // Capture the mouse until button up
+\}
+
+\VOID DrawWindow::OnLButtonUp( UINT, CPoint p )\{
+   ReleaseCapture(); // Release the mouse capture
+\}
+
+\VOID DrawWindow::OnMouseMove( UINT, CPoint p )\{
+   \IF( GetCapture() != \THIS )\{
+      \RETURN;
+   \}
+   m_document.add(p);
+   CClientDC dc(this);
+   m_document.DrawLast(&dc);
+\}
+\newpage
+// {\em Document.cpp: implementation of the Document class.}
+
+#include "Document.h"
+
+Document::Document()\{
+\}
+
+Document::~Document()\{
+\}
+
+\VOID Document::newStroke()\{
+   m_strokes.push_back( Stroke() );
+\}
+
+\VOID Document::add(const CPoint &p)\{
+   m_strokes.back().add( p );
+\}
+
+\VOID Document::draw( CDC *dc)\{
+   StrokeVector::iterator s;
+   \FOR( s=m_strokes.begin(); s!=m_strokes.end(); ++s )
+      (*s).draw(dc);
+\}
+
+VOID Document::drawLast( CDC *dc)\{
+   m_strokes.back().drawLast(dc);
+\}
+\newpage
+// {\em Stroke.cpp: implementation of the Stroke class.}
+
+#include "Stroke.h"
+
+Stroke::Stroke(\UNSIGNED \SHORT nPenWidth, \INT color):
+  m_penWidth(nPenWidth)
+, m_color(color))\{ \}
+
+Stroke::~Stroke()\{ // {\em empty} \}
+
+
+// add new point
+\VOID Stroke::add( \CONST CPoint &p )\{
+  m_points.push_back( p );
+\}
+\newpage
+// draw all points
+\VOID Stroke::Draw( CDC *pdc ) CONST\{
+   if( m_points.empty() )
+      return;  // {\em There is nothing to do}
+
+   CPen pen;
+   pen.CreatePen( PS_SOLID, m_pen_width, m_color ); 
+   CPen *oldPen = pdc -> SelectObject( &pen );
+
+   PointVector::const_iterator i= m_points.begin();
+   pdc -> MoveTo( *i );
+   ++i;
+   \WHILE( i != m_points.end() )\{
+      pdc -> LineTo( *i );
+      ++i;
+   \}
+   pdc->SelectObject( oldPen );
+\}
+
+// draw the last two points
+\VOID Stroke::DrawLast( CDC *pdc ) \CONST\{
+   \IF( m_points.size() < 2)
+      return;  // {\em There is nothing to do}
+
+   CPen pen;
+   pen.CreatePen( PS_SOLID, m_pen_width, m_color ); 
+   CPen *oldPen = pdc -> SelectObject( &pen );
+
+   int i = m_points.size()-2;
+   pdc -> MoveTo( m_points[i] );
+   pdc -> LineTo( m_points[i+1] );
+   pdc->SelectObject( oldPen );
+\}
+\end{alltt}
+\end{document}

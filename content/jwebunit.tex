@@ -1,0 +1,93 @@
+\subsubsection{JWebUnit}
+JWebUnit ist ein auf Junit und HtmlUnit basierendes
+Java-Test-Framework für Web-Applikationen. JWebUnit verwendet man am
+einfachsten mit Maven:
+\begin{lstlisting}[language=xml,
+  morekeywords={dependency,groupId,artifactId,version,scope}]
+<dependency>
+  <groupId>net.sourceforge.jwebunit</groupId>
+  <artifactId>jwebunit-htmlunit-plugin</artifactId>
+  <version>2.2</version>
+  <scope>test</scope>
+</dependency>
+ \end{lstlisting}
+\newslide
+Im Vergleich zu HtmlUnit ist die Verwendung einfacher:
+\begin{lstlisting}[language=java]
+public class SimpleWebUnitWebTest extends WebTestCase {
+  public void setUp(){
+    getTestContext().
+         setBaseUrl("http://localhost:8080/hitchhiker");
+  }
+  public void testHomePage() {
+    beginAt("/");
+    assertTitleEquals("Welcome");
+  }
+}
+\end{lstlisting}
+\newslide
+Das gilt auch für Formulare:
+\begin{lstlisting}[language=java]
+
+  public void testSubmitForm() throws Exception {
+    beginAt("/hello/login");
+    assertFormPresent("loginform");
+    assertFormElementPresent("username");
+    setTextField("username", "douglas");
+    submit();
+    assertTitleEquals( "Main" );
+  }
+\end{lstlisting}
+\newslide
+Weitere Vereinfachungen betreffen das Testen von Tabellen und HTML-Elementen
+und das Navigieren durch die Seiten.
+\begin{lstlisting}[language=java]
+  assertElementPresent("pageTitle");
+  assertTextInElement("pageTitle", "Hello World");
+\end{lstlisting}
+In diesem Beispiel wird geprüft, ob ein Element
+mit dem Id-Attribut ``pageTitle'' existiert und ob darin der
+Text ``Hello World'' enthalten ist.
+
+\newslide
+Störend ist hier wie schon bei HtmlUnit, 
+dass zuerst ein WebContainer gestartet
+werden muss, bevor man die Tests durchführt.
+
+\newslide
+Dank Jetty können diese Tests aber wie normale Unit-Tests durchgeführt
+werden:
+\begin{lstlisting}[language=java]
+import org.mortbay.jetty.Server;
+public class SimpleWebUnitWebTest extends WebTestCase {
+  private Server server;
+	
+  public void setUp() throws Exception{
+    String context="/hitchhiker";
+    // Port 0 means "assign arbitrarily port number"
+    server = new Server(0);
+    server.addHandler(new WebAppContext("src/main/webapp", context));
+    server.start();
+    int port = server.getConnectors()[0].getLocalPort();
+    getTestContext().setBaseUrl("http://localhost:"+port+context);
+  }
+..
+}
+\end{lstlisting}
+\newslide
+Dazu muss lediglich die POM-Datei etwas angepasst werden:
+\begin{lstlisting}[language=xml,
+  morekeywords={dependency,groupId,artifactId,version,scope}]
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.14</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jsp-2.1</artifactId>
+      <version>6.1.14</version>
+      <scope>test</scope>
+    </dependency> 
+\end{lstlisting}

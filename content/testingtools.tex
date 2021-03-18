@@ -1,0 +1,2486 @@
+%
+% JUnitPerf
+% Jupiter
+% Mylyn
+%
+\section{Test-Werkzeuge}
+\begin{tabularx}{\linewidth}{l|X}
+ Unit-Test-Framework & vereinfacht die Erstellung und Durchführung von
+ Unit-Tests\\
+ Automatische Durchführung  & nach einmal erfolgter Festlegung der Testfälle
+   können Funktions- und Systemtests ohne Benutzereingriffe wiederholt
+  durchgeführt werden(Record/Playback).\\
+Programmkode-Analysen & \"Uberwachung der Komplexität
+  und Standardkonformität des Programmkodes (Code-Analyzers).\\
+ Messungen des Abdeckungsgrads & Erfassung der Programmblöcke, die durch
+  die Testfälle durchlaufen resp. nicht durchlaufen werden
+ (Coverage-Analyzers).\\
+\end{tabularx}
+\newslide
+\begin{tabularx}{\linewidth}{l|X}
+ Speicheranalyse & Anzeige nicht-initialisierter
+   Speicherbereiche, der \"Uberschreitung von Bereichsgrenzen und unkorrekter
+   Freigabe von Speicherblöcken (Memory-Analyzers)\\
+ Messungen des Lastverhaltens & Untersuchung des
+  Verhaltens bei unterschiedlicher Anzahl gleichzeitiger Transaktionen
+  und/oder Datenmengen (load/performance test).\\
+ Web-Tests& \"Uberprüfung der Sicherheit, der Gültigkeit von Links und
+  der Korrektheit von HTML-Kode von web-basierten Systemen\\
+ Management und Dokumentation & Test-Planung und -dokumentation \\
+\end{tabularx}
+\newpage
+\subsection{Statische Code-Analyse}
+Statische Code-Analyse-Werkzeuge analysieren den
+ Source-, resp. Byte-Code nach bestimmten Regeln
+ohne ihn auszuführen.
+
+Typische Kategorien sind:
+\begin{itemize}
+\item Einhaltung von Programmier-Richtlinien (Code Conventions)
+\item Nullpointer-Dereferenzierung
+\item Objekt-Vergleiche
+\item Equal/Hashcode-Mismatch
+\item Performance-Probleme
+\item Nicht verwendete lokale Variable, Parameter und private Methoden
+\item Duplizierter Code
+\end{itemize}
+%
+Beispiel Findbugs:
+\ifslides
+\includegraphics[width=\linewidth]{qm/findbugs}
+\else
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{qm/findbugs}
+\caption{FindBugs User Interface}
+\end{figure}
+\fi
+%
+\newslide
+\subsubsection{Checkstyle}
+Mit Checkstyle kann die Einhaltung von Programmier-Richtlinien (Code
+Conventions) überprüft werden. Nach Bedarf kann Checkstyle an spezifische
+Anforderungen angepasst werden. Als Vorlage kann dazu die mitgelieferte
+XML-Konfigurationsdatei sun\_checks.xml, die die Java-Programmier-Richtlinien
+von Sun enthält, dienen.
+
+\ifslides
+\newpage
+\fi
+Checkstyle kann in allen gängigen Entwicklungsumgebungen integriert
+ werden. Auch ein unabhängiger Betrieb ist möglich:
+ \begin{lstlisting}[language=csh]
+% java -jar checkstyle-all-4.4.jar \
+     -c checkstyle-4.4/sun_checks.xml
+     -r src/
+ \end{lstlisting}
+Hier sollen die im src-Verzeichnis und darunter liegenden Dateien mit den
+ Regeln von sun\_checks.xml überprüft werden.
+
+Auf Gentoo:
+ \begin{lstlisting}[language=csh]
+% checkstyle \
+     -c /usr/share/checkstyle/checks/sun_checks.xml \
+     -r src/
+ \end{lstlisting}
+\newslide
+oder als Ant-Task:
+\begin{lstlisting}[language=xml]
+  <target name="checkstyle">
+    <checkstyle config="checkstyle-4.4/sun_checks.xml">
+       <fileset dir="src" includes="**/*.java" />
+    </checkstyle>
+  </target>
+\end{lstlisting}
+\newslide
+Mit Maven:
+\begin{lstlisting}[language=xml,
+  morekeywords={reporting,plugins,plugin,groupId,artifactId,configuration}]
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>config/sun_checks.xml</configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+\end{lstlisting}
+\newpage
+Beispiel:
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{qm/checkstyle}
+\caption{Checkstyle-Eclipse-Plugin}
+\end{figure}
+%
+\newslide
+\subsection{Assertions}
+Mit der Anweisung \verb+assert+ können
+bestimmte Bedingungen und Zustände überprüft werden:
+\begin{lstlisting}[language=java, morekeywords={assert}]
+  double d = 4 * a * c - b*b;
+  assert d >= 0 : "Negative Value";
+  double x1 = sqrt( d );
+\end{lstlisting}
+Das Programm überprüft die Bedingung \verb+d >= 0+ und führt die nachfolgende
+Anweisung aus, wenn sie erfüllt ist. Andernfalls wird eine Ausnahme des Typs
+AssertionError ausgelöst. Im Gegensatz zu einer if-Anweisung verbessern
+Assertions  die Lesbarkeit, und da sie sich zur Laufzeit wahlweise ein
+oder ausschalten lassen, ist ihr Einfluss auf das
+ Laufzeitverhalten, wenn sie deaktiviert sind, vernachlässigbar.
+\ifslides
+\newpage
+\fi
+Assertions müssen beim Programmaufruf explizit aktiviert werden:
+\begin{lstlisting}[language=csh]
+% java -ea AssertionTest
+\end{lstlisting}
+Beim Kompilieren muss darauf geachtet werden, dass die Option
+\verb+-source 1.4+ verwendet wird. In Eclipse betrifft dies
+die folgenden Einstellungen:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{qm/assertion-eclipse}
+\caption{Java-Compiler-Einstellungen bei Eclipse}
+\end{figure}
+Ausserdem muss die Run-Configuration das VM-Argument \verb+-ea+ enthalten.
+
+Assertions werden hauptsächlich zur Sicherstellung von sogenannten Pre- und
+Postconditions eingesetzt, also Bedingungen, die bei Beginn oder am Ende einer
+Methode erfüllt sein müssen (Invariante). Sie sollten zur Detektion von
+Programmfehlern verwendet werden. Sie bilden so ein nützliches Hilfsmittel für
+die Fehlersuche.
+%
+\newslide
+\subsection{Logging und Tracing}
+Unter Logging und Tracing versteht man die Aufzeichnung von
+Ereignissen und Daten während der Ausführung eines Programmes.
+Entwicklern und Betreibern dienen diese Informationen zur
+\begin{itemize}
+\item zur Problembehebung
+\item zum Monitoring: Überwachung des Systemverhaltens (Performance,
+      Ressourcenbedarf etc.)
+\item zum Auditing: Qualitätssicherung, Sicherheit, Zuverlässigkeit
+\end{itemize}
+Ein Quasi-Standard und Klassiker für Logging-Aufgaben
+ist im Rahmen des Apache-Projekts Log4J entstanden.
+\newpage
+ Beispiel:
+\begin{lstlisting}[language=java]
+package drawing;
+import org.apache.log4j.Logger;
+
+public class Scribble{
+  final Logger logger = Logger.getLogger(Scribble.class);
+  public Scribble(){
+    logger.trace("Entering drawing mode..");
+    logger.debug("Start a new drawing");
+    logger.info("Connected to database");
+    logger.warn("Empty input");
+    logger.error("Permission denied");
+    logger.fatal("Exhausted memory");
+  }
+}
+\end{lstlisting}
+Für das Logging von Exceptions empfiehlt sich folgendes Muster:
+\begin{lstlisting}[language=java]
+  try {
+	    ....
+
+   } catch (SomeException e) {
+	    log.error("Exception Message", e);
+			// show stack strace in log output
+   }
+\end{lstlisting}
+\subsubsection{Konfiguration}
+Die Anzeige der Meldungen, ihr Format und wohin diese letztendlich
+geschrieben (File, Console, Mail, Datenbank ..) werden sollen, kann zur
+Laufzeit festgelegt werden. Die entsprechenden
+Informationen werden in die Konfigurationsdatei \verb+log4j.properties+
+geschrieben:
+\begin{lstlisting}[escapechar=@]
+# Set root category priority to INFO and its only appender to CONSOLE.
+log4j.rootCategory=INFO, @\colorbox{yellow}{CONSOLE}@
+#log4j.rootCategory=INFO, CONSOLE, LOGFILE
+
+# Set the scribble logger category to FATAL
+log4j.logger.drawing.Scribble=FATAL
+
+# CONSOLE is set to be a ConsoleAppender using a PatternLayout.
+log4j.appender.@\colorbox{yellow}{CONSOLE}@=org.apache.log4j.ConsoleAppender
+log4j.appender.@\colorbox{yellow}{CONSOLE}@.Threshold=INFO
+log4j.appender.@\colorbox{yellow}{CONSOLE}@.layout=org.apache.log4j.PatternLayout
+log4j.appender.@\colorbox{yellow}{CONSOLE}@.layout.ConversionPattern=%l - %m%n
+
+# LOGFILE is set to be a File appender using a PatternLayout.
+log4j.appender.LOGFILE=org.apache.log4j.FileAppender
+log4j.appender.LOGFILE.File=scribble.log
+log4j.appender.LOGFILE.Append=true
+log4j.appender.LOGFILE.Threshold=INFO
+log4j.appender.LOGFILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.LOGFILE.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+\end{lstlisting}
+Diese Datei muss zur Ausführungszeit in einem der im CLASSPATH angegeben
+Verzeichnisse abgelegt werden.
+
+\newslide
+Als Alternative zur Properties-Datei bietet sich die Konfiguration mit
+XML an (log4j.xml):
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+  <appender name="stdout"
+            class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern"
+              value="%d %-5p %l - %m%n"/>
+    </layout>
+  </appender>
+
+  <logger name="drawing">
+    <level value="debug" />
+      <appender-ref ref="stdout"/>
+  </logger>
+
+  <root>
+    <priority value="warn" />
+    <appender-ref ref="stdout"/>
+  </root>
+
+</log4j:configuration>
+\end{lstlisting}
+Nebst den im log4j-Paket enthaltenen Appenders, die für die Ausgabe auf ein
+spezifisches Gerät besorgt sind, können auch eigene kreiert werden:
+ConsoleAppender, FileAppender, SMTPAppender, JDBCAppender, JMSAppender,
+NTEventLogAppender, SyslogAppender, SocketAppender, TelnetAppender.
+\newslide
+
+Ob eine Meldung ausgegeben oder unterdrückt wird, hängt mit der ihr
+zugeordneten Priorität und Kategorie zusammen. Wenn die Kategorie zum Beispiel
+auf die Log-Stufe INFO gesetzt ist, werden die darunter liegenden
+debug-Meldungen unterdrückt.
+Die Bedeutung der Log-Stufen:
+
+\begin{tabularx}{\linewidth}{llX}
+0 & TRACE & Detaillierte Mitteilungen \\
+1 & DEBUG & Allgemeine Mitteilungen (z.B. Funktionsaufruf mit Parametern)\\
+2 & INFO & Wichtige Informationen (z.B. Verbindungsaufbau)\\
+3 & WARN & Unerwartete Situationen (z.B. keine Daten)\\
+4 & ERROR & behebbarer Fehler (z.B. keine Zugriffsberechtigung)\\
+5 & FATAL & Kritischer Fehler, Programmabbruch\\
+\end{tabularx}
+
+Die folgenden Formatierungsanweisungen können für die Festlegung des
+Ausgabeformates verwendet werden:
+
+\begin{tabularx}{\linewidth}{lX}
+\%n & newline\\
+\%m & your log message\\
+\%p & message priority (FATAL, ERROR, WARN, INFO, DEBUG, TRACE \ldots)\\
+\%r & millisecs since program started running\\
+\%\% & percent sign in output\\
+\%c & name of your category (logger)\\
+\%t & name of current thread\\
+\%d & date and time\\
+\%l & Shortcut for \%F\%L\%C\%M\\
+\%F & Java source file name\\
+\%L & Java source line number\\
+\%C & Java class name\\
+\%M & Java method name\\
+\end{tabularx}
+%
+\subsubsection{Logging versus Debugging}
+Brian W. Kernighan, Rob Pike, ``The Practice of Programming'' (1999):
+\begin{quote}
+As a personal choice, we tend not to use debuggers beyond getting a stack trace
+or the value of a variable or two. One reason is that it is easy to get lost
+in details of complicated data structures and control flow; we  find stepping
+through a program less productive than thinking harder and adding output
+statements and selfchecking code at critical places. Clicking over statements
+takes longer than scanning the output of judiciously-placed displays. It takes
+less time to decide where to put print statements than to single-step to the
+critical section of code, even assuming we know where that is. More important,
+logging statements stay with the program; debugging sessions are
+transient.
+\end{quote}
+%
+\newslide
+\subsubsection{Alternativen zu Log4j}
+Es mehrere Alternativen zu Log4j. Zum Beispiel:
+\begin{itemize}
+\item \structure{java.util.logger}:
+Als Teil der Java-Standard-Edition ist das Paket sehr ähnlich wie
+log4j zu verwenden, weist jedoch bezüglich der Konfigurierbarkeit einige
+ Nachteile auf. Details siehe ``Log4j vs java.util.logging''  von Joe
+ Mc Namara.
+
+  \href{http://java.sys-con.com/read/48541.htm}
+                {java.sys-con.com/read/48541.htm}.
+\newslide
+\item \structure{Commons-Logging}:
+ Im Rahmen des Apache-Commons-Projekt wurde mit Com\-mons-Logging
+ein Wrapper-Paket entwickelt, welches
+eine Abstraktionsschicht über diese beiden Logging-Systeme anbietet und
+recht verbreitet eingesetzt wird. Von einer Verwendung wird
+jedoch abgeraten:
+``Think again before adopting the commons-logging API'' (Ceki Gülcü)
+\href{http://www.qos.ch/logging/thinkAgain.jsp}
+  {www.qos.ch/logging/thinkAgain.jsp}
+\newslide
+\item \structure{Simple Logging Facade for Java (SLF4J)}:
+Als Ersatz von Commons-Logging bietet sich mit SLF4J
+ein wesentlich verbesserter Nachfolger
+an (\href{http://www.slf4j.org}{www.slf4j.org}).
+Dieses Paket ist speziell für Entwickler von
+Java-Bib\-lio\-theken, die in unterschiedlichen Projekten eingebunden
+werden, von Interesse, da damit der Entscheid, welches Log-Modul
+verwendet werden soll, der Endanwender treffen kann.
+\newslide
+Für die Programmierer ändert sich wenig:
+\begin{lstlisting}[language=java]
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Scribble{
+  final Logger logger = LoggerFactory.getLogger(Scribble.class);
+  public Scribble(){
+    logger.trace("Entering drawing mode..");
+    logger.debug("Starting a new drawing");
+    logger.info("Connected to database");
+    logger.warn("Empty input");
+    logger.error("Permission denied");
+  }
+}
+\end{lstlisting}
+Der Log-Level FATAL wurde entfernt, da er für nicht besonders nützlich
+gehalten wird.
+
+SLF4J bietet zudem verschiedene Verbesserungen an, zum Beispiel
+bei der Ausgabe von Meldungen mit Parametern:
+\begin{itemize}
+\item mit Log4J:
+  \begin{lstlisting}[language=java]
+logger.info("Temperature set to "+ newtemp +
+               " (previous "+ prevtemp+")");
+  \end{lstlisting}
+\item besser mit SLF4J (besseres Laufzeitverhalten):
+  \begin{lstlisting}[language=java]
+logger.info("Temperature set to {} (previous {})",
+           newtemp, prevtemp );
+         \end{lstlisting}
+       \end{itemize}
+\newslide
+SLF4J bietet eine Vielzahl von Möglichkeiten zur Integration bestehender
+Logging-Frameworks:
+
+\includegraphics[width=\linewidth]{qm/xfig/slf4j}
+
+\newslide
+Für Maven lauten die entsprechenden Dependency-Einträge in der POM-Datei
+für SLF4j mit Log4j:
+\begin{lstlisting}[language=xml,
+  morekeywords={dependency,groupId,artifactId,scope}]
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.1</version>
+      <scope>runtime</scope>
+    </dependency>
+\end{lstlisting}
+\newslide
+\item \structure{Logback}: Logback kann man als
+  eigentlichen Nachfolger von Log4J, dessen Weiterentwicklung seit
+  einiger Zeit gestoppt zu sein scheint, bezeichnen.
+Es wurde vom Logging-Spezialisten Ceki Gülcü,
+dem Gründer der Projekte Log4J und SLF4J, gestartet
+und stösst auf wachsendes Interesse.
+\href{http://logback.qos.ch}{logback.qos.ch}
+\begin{lstlisting}[language=xml,morekeywords={dependency,groupId,artifactId}]
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.0.7</version>
+</dependency>
+\end{lstlisting}
+Da Logback die SLF4J-Schnittstelle implementiert,
+gibt es im Vergleich zu SLF4J im Programmcode eigentlich keine
+Unterschiede.
+\newslide
+ Die Konfiguration hingegen erfolgt in der Datei logback.xml und bietet
+zahlreiche Erweiterungen (es existiert sogar eine Grovvy-Variante):
+\begin{lstlisting}[language=xml,
+  morekeywords={configuration,appender,encoder,pattern,root}]
+<configuration>
+
+  <appender name="STDOUT"
+            class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d [%thread] %-5level %logger - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
+
+
+\end{lstlisting}
+\end{itemize}
+%
+\newslide
+\subsection{Vergleiche von Textdateien}
+Vergleiche von Textdateien sind oft nicht einfach, wenn man dazu
+nicht einen spezialisierten Texteditor (z.B Emacs, what else?) verwenden will.
+Unter den Unix-Werkzeugen gibt es jedoch zwei Programme, die
+uns diese Aufgabe vereinfachen: diff und cmp.
+
+\newslide
+Beispiel:
+\begin{lstlisting}[basicstyle=\small]
+$ diff colors1.txt colors2.txt
+
+ 6c6
+ < # indigo
+  ---
+  > # indigo-blue
+  11d10
+  < # sienna
+  12a12
+  > # darkblue
+  15c15
+  < # tomato
+  ---
+  > # tomato-red
+\end{lstlisting}
+\newslide
+Die Ausgabe erscheint auf den ersten Blick etwas verwirrend.
+Versuchen wir es nochmals mit der Option -u (unified):
+\begin{lstlisting}
+$ diff -u colors1.txt colors2.txt
+
+  --- colors1.txt 2005-04-01 20:45:21.954828407 +0200
+  +++ colors2.txt 2005-04-01 20:44:50.152742422 +0200
+  @@ -3,13 +3,13 @@
+  # darkred
+  # deeppink
+  # firebrick
+  -# indigo
+  +# indigo-blue
+  # limegreen
+  # royalblue
+  # sandybrown
+  # seagreen
+  -# sienna
+  # silver
+  +# darkblue
+  # skyblue
+  # teal
+  -# tomato
+  +# tomato-red
+\end{lstlisting}
+Die Unterschiede sind nun offensichtlicher. Die abweichenden
+Zeilen sind mit den Zeichen \verb+-+ und \verb|+| markiert.
+In der ersten Datei steht ''indigo''
+in der zweiten ''indigo-blue''. Der zweiten Datei fehlt der Eintrag
+sienna, dafür gibt es darkblue, etc. etc.
+
+\newslide
+Eine noch bessere Übersicht hat man mit
+\begin{lstlisting}
+$ diff -y -W 50 colors1.txt colors2.txt
+
+# chocolate             # chocolate
+# crimson               # crimson
+# darkred               # darkred
+# deeppink              # deeppink
+# firebrick             # firebrick
+# indigo              | # indigo-blue
+# limegreen             # limegreen
+# royalblue             # royalblue
+# sandybrown            # sandybrown
+# seagreen              # seagreen
+# sienna              <
+# silver                # silver
+                      > # darkblue
+# skyblue               # skyblue
+# teal                  # teal
+# tomato              | # tomato-red
+\end{lstlisting}
+Das Zeichen \verb+|+ zeigt eine Abweichung an und die Zeichen
+\verb+>+ und  \verb+<+ teilen mit, dass in der ersten
+respektive zweiten Datei ein zusätzlicher
+Eintrag vorhanden ist.
+Die Option -y
+steht für ''nebeneinander'' während die Option ''-W 50''
+die Spaltenbreite setzt.
+
+\newslide
+Damit scheint diff für Textvergleiche am besten geeignet zu sein.
+Mit dem Programm cmp kann keine annähernd so übersichtliche
+Ausgabe erzeugt werden:
+\begin{lstlisting}
+$ cmp colors1.txt colors2.txt
+
+ colors1.txt colors2.txt differ: byte 64, line 6
+\end{lstlisting}
+Wenn es jedoch lediglich darum geht herauszufinden, ob
+Abweichungen vorhanden sind, kann dies vorteilhafter sein.
+
+Quelle:
+\href{http://www.brunolinux.com/02-The_Terminal/Diff_and_Cmp.html}
+{www.brunolinux.com/02-The\_Terminal/Diff\_and\_Cmp.html}
+\newslide
+\subsection{Integritätsprüfung mit Md5sum}
+Die MD5-Summen (RFC 1321)
+aller in im aktuellen Verzeichnis und darunter
+liegenden Dateien können auf einem Unix-System mit folgender Anweisung
+in eine Textdatei geschrieben werden:
+\begin{lstlisting}
+$ find . -type f 2>/dev/null -exec md5sum {} \; >test.md5
+\end{lstlisting}
+Diese Datei könnte beispielsweise folgende Zeilen enthalten:
+\begin{lstlisting}
+f3dd21a2023813be41c9f4b879783d38  ./colors.txt
+9dab480789443d080d347138acdad7e5  ./quick_ref.pdf
+f91449e7f5661b64c568a6c8a8834224  ./Console-Colors
+a1ef1c1dc94d5a6d44dd5e0678f436a8  ./dsp.sxw
+..
+\end{lstlisting}
+%$
+\newslide
+Es handelt sich um 128-Bit-Hashwerte, die man auch als
+''Fingerabdruck'' einer Datei bezeichnet.
+Die so erstellte Datei test.md5 kann nun verwendet werden,
+um zu einem späteren Zeitpunkt
+zu prüfen, ob sich etwas geändert hat (Integritätsprüfung):
+\begin{lstlisting}
+  md5sum -c test.md5
+\end{lstlisting}
+Quelle: \href{http://www.brunolinux.com/02-The_Terminal/Diff_Find_and_Md5sum.html}
+  {www.brunolinux.com/02-The\_Terminal/Diff\_Find\_and\_Md5sum.html}
+%
+\newslide
+\subsection{Unit-Test}
+\subsubsection{JUnit}
+JUnit ist ein einfaches und mächtiges Java-Framework für die
+Entwicklung und das Ausführen von Unit-Tests.
+%Mit Hilfe von Klassenbibliotheken wie
+%CppUnit \href{http://CppUnit.sourceforge.net}{CppUnit.sourceforge.net} oder
+%JUnit \href{http://JUnit.org}{JUnit.org}
+%lassen sich Unit-Tests weitgehend automatisieren.
+
+Man geht dazu wie folgt vor:
+\begin{enumerate}
+\item Man erstellt eine Klasse K
+  (z.B. SimpleTest), die von TestCase abgeleitet
+ ist:
+\begin{lstlisting}[language=java]
+import java.util.*;
+import junit.framework.*;
+
+public class SimpleTest extends TestCase {
+
+}
+\end{lstlisting}
+\newslide
+\item Für jeden Test XXX wird eine Methode \lstinline{void testXXX()}
+  definiert,
+  in welcher Soll- und Ist-Werte mittels \lstinline{assertEquals( soll, ist )}
+   verglichen werden
+  oder allgemein mit
+
+\lstinline{assertTrue( bool exp )}
+
+auf die Bedingung \verb+true+ getestet wird.
+\begin{lstlisting}[language=java]
+  public void testEmptyCollection() {
+    Collection collection = new ArrayList();
+    assertTrue(collection.isEmpty());
+  }
+ \end{lstlisting}
+  Beim Testen von Gleitkommawerten kann mit der Methode
+  \lstinline{assertEquals( soll, ist, delta )} geprüft werden, ob die Werte
+  innerhalb des mit delta festgelegten Intervalles liegen.
+\newslide
+\item Die Methoden \verb|setUp()| und \verb|tearDown()|
+können für die Instantiierung und das Aufräumen
+  der Testobjekte verwendet werden. Dies wird auch Fixture (engl.
+  Vorrichtung) genannt.
+\item Mit der Methode \verb+suite()+ wird eine TestSuite erstellt,
+  die dank dem Java-Reflection-Mechanismus automatisch alle test-Methoden
+  aufruft:
+\begin{lstlisting}[language=java]
+  public static Test suite() {
+    return new TestSuite(SimpleTest.class);
+  }
+\end{lstlisting}
+\newslide
+\item Schlussendlich wird noch die main-Funktion benötigt:
+\begin{lstlisting}[language=java]
+  public static void main(String args[]) {
+    junit.textui.TestRunner.run(suite());
+  }
+\end{lstlisting}
+\end{enumerate}
+Mit der Anweisung:
+\begin{verbatim}
+% java junit.swingui.TestRunner SimpleTest
+\end{verbatim}
+wird ein grafisches Frontend gestartet,
+die TestSuite ausgeführt und die Ergebnisse angezeigt.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{qm/guitestrunner}
+\end{center}
+\caption{JUnit TestRunner}
+\end{figure}
+\ifslides
+\newpage
+\includegraphics[width=\linewidth]{qm/xfig/cppunit-seq}
+\else
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{qm/xfig/cppunit-seq}
+\caption{JUnit Sequenzdiagramm}
+\end{figure}
+\fi
+
+Noch einfacher geht es mit Eclipse:
+\begin{enumerate}
+\item File $\longrightarrow$ New $\longrightarrow$ Junit Test Case
+
+ Es erscheint das Dialog-Fenster ``New JUnit Test Case''. Hiermit
+lässt sich die TestCase-Klasse erzeugen. Es empfiehlt sich jedoch
+die Warnung
+
+``JUnit .. is not on the build path...''
+
+zu beachten und mit ``Click here'' die Archiv-Datei dem Build-Pfad
+hinzu zufügen.
+\newslide
+\item Man schreibt eine Test-Methode. Z.B:
+\begin{lstlisting}[language=java]
+  public void testEmptyCollection() {
+    Collection collection = new ArrayList();
+    assertTrue(collection.isEmpty());
+  }
+ \end{lstlisting}
+\newslide
+\item Man kreiert einen neuen JUnit-Test:
+
+Run $\longrightarrow$ Run\ldots $\longrightarrow$ JUnit $\longrightarrow$ New
+
+\item Man führt den Test aus.
+\end{enumerate}
+\newslide
+Es empfiehlt sich grundsätzlich mit der Entwicklung von Tests zu beginnen und
+ erst anschliessend die entsprechende Klasse zu implementieren.
+Dies wird als test-getriebenes Vorgehen bezeichnet:
+abwechslungsweise
+ein wenig kodieren und dann wieder ein wenig testen. Oder
+wie es Bill Wake \footnote{Extreme Programming Explored}
+sehr zutreffend ausdrückt:
+\begin{quote}
+There's a rhythm to it, like a pendulum of a clock: test a little,
+code a little, test a little, code a little.
+\end{quote}
+Die Klassen
+ werden dadurch einfacher testbar und zudem verbessert sich auch ganz generell
+ das Programmdesign. Diese Methode wird auch Test-Driven-Development (TDD)
+ genannt.
+\newslide
+Wem das alles bereits zu fundamentalistisch vorkommt,
+der kann sich ja an das
+\href{http://www.developertesting.com/archives/month200702/20070206-000391.html}
+{Testivus-Manifest}
+von Alberto Savoia halten:
+\begin{itemize}
+\item Less testing dogma, more testing karma.
+\item Any tests are better than no tests.
+\item Testing beats debugging.
+\item Test first, during, or after -- whatever works best for you.
+\item If a method, technique, or tool, gives you more or better tests use it.
+\end{itemize}
+%
+\newslide
+\subsubsection{Junit4}
+Die aktuelle Verion 4 von Junit bietet gegenüber der Version 3.8
+die folgenden Verbesserungen:
+\begin{itemize}
+\item POJO-Klassen mit Annotationen statt Ableiten von TestCase:
+\begin{itemize}
+\item \textcolor{red}{@Test} kennzeichnet Methoden als ausführbare Testfälle.
+\item \textcolor{red}{@Before} und \textcolor{red}{@After}
+  markieren Setup- bzw. Teardown-Aufgaben, die
+  für jeden Testfall wiederholt werden sollen.
+\item \textcolor{red}{@BeforeClass} und \textcolor{red}{@AfterClass}
+  markieren Setup-
+  bzw. Teardown-Aufgaben, die nur einmal pro Testklasse ausgeführt
+  werden sollen.
+\end{itemize}
+\item Testen von Exceptions und Timeouts
+\end{itemize}
+\newslide
+\begin{lstlisting}[language=java,escapechar=\%]
+import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class SimpleTest {
+
+    %\textcolor{red}{@Before}%
+    public void setUp() throws Exception {
+    }
+
+    %\textcolor{red}{@After}%
+    public void tearDown() throws Exception {
+    }
+
+    %\textcolor{red}{@Test}%(expected=ArrayIndexOutOfBoundsException.class)
+    public void indexOutOfRange(){
+      double x[] = new double [1];
+      x[1]=0;
+    }
+
+    %\textcolor{red}{@Test}%
+    public void testDummy(){
+      Assert.assertEquals(1,2);
+    }
+}
+\end{lstlisting}
+%Durch die Anweisung \lstinline[language=java]{import static
+%    Assert.assertEquals} kann vereinfacht geschrieben werden
+%  assertEquals(1,2)
+%
+%Ein Nachteil von Junit4 ist die noch fehlende Unterstützung in Ant.
+%
+\newslide
+\subsubsection{TestNG}
+In eine ähnliche Richtung wie Junit4 geht auch TestNG. TestNG
+ bietet jedoch noch einige zusätzliche Möglichkeiten:
+\begin{itemize}
+\item XML-Konfiguration
+\item Gruppierung von Tests
+\item Festlegung von Abhängigkeiten, paralleles Testen
+\item parametrisiertes Testen
+\end{itemize}
+\newslide
+Beispiel:
+\begin{lstlisting}[language=java,escapechar=\%]
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+
+public class SimpleTest {
+
+  %\textcolor{red}{@BeforeTest}%
+  public void setUp() throws Exception {
+  }
+
+  %\textcolor{red}{@AfterTest}%
+  public void tearDown() throws Exception {
+  }
+
+  %\textcolor{red}{@Test}%(expectedExceptions=ArrayIndexOutOfBoundsException.class)
+  public void indexOutOfRange(){
+    double x[] = new double [1];
+    x[1]=0;
+  }
+
+  %\textcolor{red}{@Test}%
+  public void testDummy(){
+    assert 1==2;
+  }
+}
+\end{lstlisting}
+\newslide
+\subsubsection{Mock-Objekte}
+Beim Unit-Testen ist man darauf angewiesen, dass die Methoden der zu testenden
+Klasse weitgehend von der Umgebung isoliert ausgeführt werden
+können. Leider kann diese Voraussetzung in den meisten Fällen nicht
+erfüllt werden. Oft sind die
+Klassen auf vielfältige Art mit weiteren Klassen oder Systemen wie zum
+Beispiel Filesystemen, Datenbanken, Web-Server, Netzwerken,
+Hardware-Schnittstellen etc. verbunden. Will man solche Klassen
+testen, bedeutet es, dass man sie von der ``realen'' Umgebung
+abschirmt. Am einfachsten
+macht man dies mit Hilfe von Attrappen, die in die
+Testobjekte eingeschleust werden. Wenn man das richtig macht, können
+Attrappen dafür sorgen, dass die
+Tests in einer deterministischen Umgebung ablaufen.
+
+\newslide
+Ein einfache Attrappe, ``Dummy'' oder ``Stub'' genannt, müsste keine
+eigene Logik enthalten, sondern einfach zweckmässige Resultate zurück geben
+zum Beispiel in Form  konstanter Werte.
+
+Eine interessantere Variante solcher
+Attrappen sind jedoch Mock-Objekte. Darunter versteht man Objekte, die ein
+Endo-Testen ermöglichen, also ein Testen von Innen.
+
+\newslide
+Dies soll anhand von folgendem, vereinfachten Beispiel erläutert werden:
+\begin{lstlisting}[language=java]
+public class RFIDReader {
+  private SerialPort port;
+  private boolean errorFlag;
+
+  public RFIDReader(){
+    errorFlag=false;
+    port = new SerialPort("COM1", 9600 );
+    port.open();
+  }
+\end{lstlisting}
+\newslide
+Die Methode list gibt die gelesenen Tags auf der Konsole aus:
+\begin{lstlisting}[language=java]
+  public void list(){
+    String rfidTag;
+    try{
+      while ((rfidTag = port.read()) != null) {
+        System.out.println( rfidTag );
+      }
+    }
+    catch( ReadError ex ){ errorFlag=true;}
+    port.close();
+  }
+\end{lstlisting}
+\newslide
+Mit isError kann auf Lesefehler geprüft werden:
+\begin{lstlisting}[language=java]
+public boolean isError(){
+    return errorFlag;
+  }
+}
+\end{lstlisting}
+\newslide
+Mit der Klasse RFIDReader können RFID-Tags (Radio Frequency Identifier), die
+von einer seriellen Schnittstelle gelesen werden, auf der Konsole ausgegeben
+werden:
+\begin{lstlisting}[language=java]
+  RFIDReader reader = new RFIDReader();
+  reader.list();
+\end{lstlisting}
+\newslide
+Diese Klasse lässt sich eigentlich kaum mit JUnit testen:
+\begin{itemize}
+\item Das SerialPort-Objekt ist fest vorgegeben im Konstruktor.
+\item Die Rückgabewerte der read-Methode sind nicht beeinflussbar und damit
+  nicht deterministisch.
+\item Die Ausgabe wird auf System.out geschrieben.
+\end{itemize}
+\newslide
+Mit den folgenden Modifikationen kann die Klasse mit JUnit getestet werden:
+\begin{itemize}
+\item Das Port-Objekt wird durch ein Interface beschrieben und dem Konstruktor
+  oder einer setter-Methode als Argument übergeben:
+\newslide
+  \begin{lstlisting}[language=java]
+public interface Port {
+  public void open();
+  public String read() throws ReadError;
+  public void close();
+}
+
+public class RFIDReader {
+  private Port port;
+  public RFIDReader(Port p){
+    errorFlag=false;
+    port = p;
+  }
+  ..
+  \end{lstlisting}
+\newslide
+\item Die List-Methode verwendet ein Stream-Objekt für die Ausgabe:
+  \begin{lstlisting}[language=java]
+    ..
+  public void list( PrintStream out ){
+    String rfidTag;
+    try{
+      while ((rfidTag = port.read()) != null) {
+        out.println( rfidTag );
+      }
+    }
+    catch( ReadError ex ){
+      errorFlag=true;
+    }
+    port.close();
+  }
+  ..
+  \end{lstlisting}
+\end{itemize}
+Dadurch liesse sich beispielsweise der folgende Test ausführen:
+\begin{lstlisting}[language=java]
+  ...
+    public void testReader(){
+        MockPort mockport = new MockPort();
+        RFIDReader r = new RFIDReader( mockport );
+        r.list( mockport );
+        mockport.verify();
+    }
+  ...
+\end{lstlisting}
+Die eigentlichen Tests erfolgen nun im Mock-Objekt selbst.
+
+\newslide
+Damit die Ausgabe der List-Methode geprüft werden kann, muss
+die Klasse von PrintStream abgeleitet sein und das Interface Port
+implementieren:
+\begin{lstlisting}[language=java]
+..
+import junit.framework.Assert;
+
+public class MockPort extends PrintStream implements Port{
+    private ArrayList list;
+    private Iterator outIterator;
+    private Iterator inIterator;
+    private boolean isClosed;
+    private boolean isOpen;
+
+..
+}
+\end{lstlisting}
+\newslide
+Im Konstruktor wird eine Liste mit RFID-Tags erstellt, die
+beim Read-Aufruf zurückgegeben werden:
+\begin{lstlisting}[language=java]
+public MockPort() {
+        super(System.out);
+        list = new ArrayList();
+        list.add("E004010002035FE7");
+        list.add("0900000033E52E12");
+        list.add("E004010002035BFB");
+        inIterator = list.iterator();
+        outIterator = list.iterator();
+    }
+\end{lstlisting}
+\newslide
+Die Read-Methode gibt bei jedem Aufruf das nächste Element der
+Tag-Liste
+zurück:
+\begin{lstlisting}[language=java]
+  public String read() throws ReadError {
+        if( !inIterator.hasNext() ){
+            return null;
+        }
+        return (String)inIterator.next();
+    }
+  \end{lstlisting}
+\newslide
+Die Print-Methode überprüft nun, ob die RFID-Tags in der richtigen
+Reihenfolge eintreffen:
+\begin{lstlisting}[language=java]
+  public void println( String s ){
+        if( !outIterator.hasNext() ){
+            Assert.fail("overrun");
+        }
+        if( !s.equals( (String)outIterator.next())){
+            Assert.fail("changed sequence");
+        }
+    }
+  \end{lstlisting}
+\newslide
+Weitere Tests wären mit den Funktionen open und close möglich:
+\begin{lstlisting}[language=java]
+  public void open() {
+        isOpen=true;
+        isClosed=false;
+    }
+
+    public void close() {
+        isClosed=true;
+        isOpen=false;
+    }
+  \end{lstlisting}
+\newslide
+Nach Beendigung der Tests kann verify zum Beispiel prüfen, ob
+der Port geschlossen wurde:
+\begin{lstlisting}[language=java]
+public void verify(){
+        if( !isClosed ){
+            Assert.fail( "port not closed");
+        }
+    }
+}
+\end{lstlisting}
+{\bfseries Fazit:} Mit Hilfe von Mock-Objekten lassen sich auch komplexe
+Klassen bis ``in den hintersten Winkel'' austesten.
+Der einzige Nachteil beim Testen mit Mock-Objekten ist der Aufwand,
+der nötig wird, um diese Klassen zu implementieren. Hier können
+jedoch Frameworks Abhilfe schaffen.
+\newslide
+Zum Beispiel EasyMock:
+Mock-Objekte lassen sich auf der Basis von Interfaces zur Laufzeit
+erzeugen:
+\begin{lstlisting}[language=java]
+import org.easymock.EasyMock;
+
+public class RFIDReaderTest {
+  private Port mock;
+  private RFIDReader reader;
+
+  @Before
+  public void setUp() {
+    mock = EasyMock.createMock(Port.class);
+    reader = new RFIDReader(mock);
+  }
+\end{lstlisting}
+\newslide
+Wenn man einen Testfall schreibt, muss man zunächst dem Mock-Objekt mitteilen,
+welche Methoden in welcher Reihenfolge aufgerufen werden
+und welche Ergebnisse sie zurückliefern sollen:
+\begin{lstlisting}[language=java]
+  @Test
+  public void testReader() throws ReadError{
+    String expectedTags[] ={
+      "E004010002035FE7",
+      "0900000033E52E12",
+      "E004010002035BFB"
+    };
+    for( int i=0; i<expectedTags.length; i++){
+      EasyMock.expect(mock.read()).andReturn( expectedTags[i] );
+    }
+    EasyMock.expect( mock.read() ).andReturn( null );
+    mock.close();
+    EasyMock.replay( mock );
+
+    String returnedTags[] = reader.getTags();
+    Assert.assertEquals( "number of RFID tags",
+                  expectedTags.length, returnedTags.length);
+    EasyMock.verify( mock );
+ }
+\end{lstlisting}
+Nachdem man die Methode replay() aufgerufen hat, kann der Test
+durchgeführt werden.
+
+\newslide
+Zur Vereinfachung wurde hier die Methode getTags()
+der RFIDReader-Klasse hinzugefügt:
+\begin{lstlisting}[language=java]
+  public String [] getTags() {
+    ArrayList<String> list = new ArrayList<String>();
+
+    try{
+      String rfidTag;
+      while ((rfidTag=port.read() ) != null) {
+        list.add( rfidTag );
+      }
+    }
+    catch( ReadError ex ){
+      errorFlag=true;
+    }
+    String receivedTags[] = new String[ list.size()];
+    list.toArray( receivedTags );
+    return receivedTags;
+  }
+\end{lstlisting}
+Sie gibt einen String-Array mit den gelesenen RFID-Tags zurück.
+%-------------------------------------------------------------------------
+\newslide
+\subsubsection{DBUnit}
+Die grundsätzliche Problematik beim Testen von Datenbank-Code
+beschreibt Richard Dallaway sehr anschaulich:
+\href{http://www.dallaway.com/acad/dbunit.html}
+{www.dallaway.com/acad/dbunit.html}
+\begin{quote}
+I'm guessing some, if not a lot, of database development goes like
+this: set up database, write code to access database, run code, do a
+SELECT to see if the records showed up in the database. They did?
+Good, then we're done.
+\end{quote}
+Die visuelle Überprüfung von Testergebnissen ist mühsam und wird oft
+nicht mit der nötigen Sorgfalt gemacht. Wenn nach einigen Wochen oder
+Monaten derselbe Test wieder durchgeführt wird, hat man meist
+vergessen, worauf speziell zu achten ist\ldots
+
+\newslide
+Auch hier ist der
+Einsatz eines automatisierbaren Testsystemes
+angebracht.
+
+\begin{quote}
+Automated tests — painless tests that run often and test lots — reduce
+the chances of your data is going missing. I find they make it easier
+for me to sleep at night. (Tests have other positive features: they're
+good examples of how to use code, they act as documentation, they make
+other people's code less scary when you need to change it, they reduce
+debugging time).
+\end{quote}
+
+Automatisierte Tests schaffen die Voraussetzung, dass Code
+änderbar bleibt.
+
+\newslide
+Ein guter Test stellt möglichst geringe Anforderung an seine Umgebung,
+er beschafft sich selbst die nötigen Daten und räumt hinterher wieder
+auf, so dass keine unerwarteten Seiteneffekte auftreten. Bei
+Datenbanken bedeutet dies, dass vor jeder Testdurchführung die Tabellen mit
+bestimmten Werten gefüllt werden müssen. Was wiederum zur Folge hat,
+dass man in einer typischen Entwicklungsorganisation verschiedene
+Datenbanken benötigt:
+
+\newslide
+\begin{enumerate}
+\item die Produktions-DB: enthält die produktiv verwendeten Daten,
+  hier dürfen keine Tests durchgeführt werden,
+\item die lokale Entwicklungs-DB: wird zur SW-Entwicklung verwendet,
+  in der Regel hat jeder Entwickler seine eigene Version, hier werden
+  die meisten Tests ausgeführt, sie enthält nur eine minimale Anzahl von
+  Datensätzen,
+\item eine Test-DB: wird von mehreren Entwicklern gemeinsam für Tests
+  genutzt, enthält eine Kopie der produktiv genutzten Daten,
+\item die Integrations-DB: dient der Durchführung der Integrations- und
+  System-Tests vor der Inbetriebnahme,
+  enthält eine Kopie der produktiv genutzten Daten,
+ \end{enumerate}
+Dabei muss darauf geachtet werden, dass die
+Synchronisation der Datenbankstruktur gewährleistet
+ist: d.h., dass allfällige Änderungen der Tabellen, Trigger,
+Stored-Procedures, Constraints etc.  in allen Datenbanken
+stets korrekt nachgeführt werden.
+
+\newslide
+Beispiel:
+\begin{lstlisting}[language=java]
+public class TestDbAccess {
+  private Connection jdbcConnection;
+  private IDatabaseConnection conn;
+
+  public TestDbAccess( String name ){
+    super(name);
+     Class driverClass =
+     Class.forName("com.mysql.jdbc.Driver");
+
+   Connection jdbcConnection =
+	 DriverManager.getConnection(
+	  "jdbc:mysql://localhost/Mondial", "biggus", "dickus");
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    IDataSet dataSet = new FlatXmlDataSet(
+                 new FileInputStream("mondial-partial.xml"));
+    conn = new DatabaseConnection(jdbcConnection);
+    DatabaseOperation.CLEAN_INSERT.execute(conn, dataSet);
+  }
+
+  @After
+  protected void tearDown() throws Exception {
+    conn.close();
+  }
+ ..
+}
+\end{lstlisting}
+Die Set-Up-Methode sorgt für ein Löschen und Neuladen
+der Tabellen vor jedem Test. Dabei wird mit ''mondial-partial.xml''
+eine XML-Datei verwendet, die
+mit dem DB-Schema der Test-DB korrespondiert:
+\begin{lstlisting}[language=xml,morekeywords={dataset}]
+<dataset>
+  <country Name="Austria" Code="A"
+           Capital="Vienna"
+           Province="Vienna"
+           Area="83850" Population="8023244"/>
+  <country Name="Switzerland" Code="CH"
+           Capital="Bern" Province="BE"
+           Area="41290" Population="7207060"/>
+...
+</dataset>
+\end{lstlisting}
+\newslide
+\begin{lstlisting}
++------------+-------------+------+-----+---------+
+| Field      | Type        | Null | Key | Default |
++------------+-------------+------+-----+---------+
+| Name       | varchar(32) | NO   | UNI |         |
+| Code       | varchar(4)  | NO   | PRI |         |
+| Capital    | varchar(35) | YES  |     | NULL    |
+| Province   | varchar(32) | YES  |     | NULL    |
+| Area       | int(11)     | YES  |     | NULL    |
+| Population | int(11)     | YES  |     | NULL    |
++------------+-------------+------+-----+---------+
+\end{lstlisting}
+Eine solche Datei kann mit Hilfe von DBUnit aus einer bestehenden
+Datenbank generiert werden.
+
+\newslide
+Nicht nur einzelne Werte sondern
+auch ganze Tabellen können mit DBunit einfach geprüft werden:
+\begin{lstlisting}[language=java]
+   @Test
+   public void testMe() throws Exception {
+     // Execute the tested code that modify the database here
+     ...
+     // Fetch database data after executing your code
+     IDataSet databaseDataSet = conn.createDataSet();
+     ITable actualTable = databaseDataSet.getTable("Country");
+     // Load expected data from an XML dataset
+     IDataSet expectedDataSet = new FlatXmlDataSetBuilder().
+              build(new File("expectedDataSet.xml"));
+     ITable expectedTable = expectedDataSet.getTable("Country");
+     // Assert actual database table match expected table
+     Assertion.assertEquals(expectedTable, actualTable);
+    }
+\end{lstlisting}
+%\newslide
+%\subsubsection{XML Unit-Test}
+%Da XML-Dokumente ganz offensichtlich nicht wie
+%andere Textdateien durch einen zeilenweisen Vergleich
+%geprüft werden können ..
+%
+% http://www.infoq.com/articles/xml-unit-test
+% http://www.ibm.com/developerworks/java/library/j-cq121906.html
+%
+%\newpage
+\subsubsection{Testbericht-Generierung mit Ant und Maven}
+Sowohl Ant wie auch Maven eignen sich für die automatisierte
+Testdurchführung und Generierung der Testreports.
+
+Junit-Tests können mit dem Ant-Task \verb+junit+ durchgeführt werden:
+\begin{lstlisting}[language=xml,
+  morekeywords={target,path,pathelement,junit,classpath,batchtest,fileset}]
+<path id="project.classpath">
+  <pathelement path="lib/junit.jar"/>
+  <pathelement path="${build.dir}"/>
+</path>
+
+<target name="test" depends="compile">
+  <junit>
+    <classpath refid="project.classpath"/>
+    <batchtest>
+      <fileset dir="${build.dir}"
+               includes="**/*Test.class"/>
+    </batchtest>
+  </junit>
+</target>
+\end{lstlisting}
+%$
+Das Target ''test'' sorgt hier dafür, dass die Testmethoden aller Klassen,
+deren Bezeichner mit den Zeichen ``Test'' endet, ausgeführt werden.
+\ifslides
+\else
+(ACHTUNG: Vorgängig muss die Datei junit.jar ins lib-Verzeichnis von Ant
+kopiert werden, andernfalls beklagt sich ant über eine fehlende
+Junit-TestCase-Klasse. Bei Eclipse 3.0 muss man mit
+Windows $\longrightarrow$ Preferences $\longrightarrow$ Ant $\longrightarrow$
+ Runtime
+  $\longrightarrow$ Classpath $\longrightarrow$
+                Global Entries $\longrightarrow$ Add External Jar
+die im Eclipse-Verzeichnis
+  plugins/org.junit\_3.8.1
+liegende Datei junit.jar  hinzufügen.)
+%http://www.ryanlowe.ca/blog/archives/001038_junit_ant_task_doesnt_work_in_eclipse.php
+\fi
+
+\newslide
+Die Testergebnisse können mit einem Formatter in eine XML-Datei ausgegeben
+werden:
+\begin{lstlisting}[language=xml,
+  morekeywords={target,formatter,junit,classpath,batchtest,fileset}]
+<target name="test" depends="compile">
+  <junit>
+    <classpath refid="project.classpath"/>
+    <formatter type="xml"/>
+    <batchtest>
+      <fileset dir="${build.dir}/classes"
+               includes="**/*Test.class"/>
+    </batchtest>
+  </junit>
+</target>
+\end{lstlisting}
+%$
+\newslide
+Aus dieser XML-Datei wird schliesslich
+der Testbericht in HTML-Format mit dem Task junitreport erzeugt:
+\begin{lstlisting}[language=xml,morekeywords={junitreport,report,fileset}]
+<junitreport>
+  <fileset><include name="TEST*.xml" /></fileset>
+  <report format="frames"></report>
+</junitreport>
+\end{lstlisting}
+\begin{figure}[H]
+\ifslides
+\begin{center}
+\includegraphics[width=0.75\linewidth]{qm/junitreport}
+\end{center}
+\else
+\includegraphics[width=\linewidth]{qm/junitreport}
+\fi
+\caption{Ein mit Apache Ant erzeugter Junit-Report}
+\end{figure}
+%HINWEIS: Problem bei Eclipse. (www.ryanlowe.ca)
+%
+%  ``.. Ant could not find the task or a class this task relies upon ..''
+%
+% .. So you need to tell Ant where to find a copy of junit.jar:
+%
+%  Window $\longrightarrow$ Preferences, Ant $\longrightarrow$ Runtime
+%
+%  In the Classpath tab click on Global Entries and then Add External JARs....
+%
+% Eclipse already has a copy of JUnit, so in the dialog find your Eclipse
+% plugins directory ([ECLIPSE\_DIR]/plugins/) and go to the JUnit plugin
+% (presently org.junit\_3.8.1) and select junit.jar.
+%
+%%Now all of your Ant
+%% scripts will know how to do the <junit> Ant task.
+%%
+%% www.cengua.com/clover
+%%
+\newslide
+Mit Maven ist es wesentlich einfacher:
+\begin{lstlisting}[language=xml,
+  morekeywords={reporting,plugins,plugin,artifactId}]
+<reporting>
+  <plugins>
+    <plugin>
+      <artifactId>maven-surefire-report-plugin</artifactId>
+      <version>2.12</version>
+    </plugin>
+  </plugins>
+</reporting>
+\end{lstlisting}
+Bemerkung: in Multimodul-Projekten kann mit
+\lstinline[language=xml]{<aggregate>true</aggregate>}
+dafür gesorgt werden, dass im
+Parent-Modul die Resports aller Child-Module zusammengeführt werden.
+%
+\newslide
+\subsubsection{Messung des Abdeckungsgrades}
+Mit Code-Coverage-Analysen können ungetestete Code-Stellen identifiziert
+werden. Dadurch lassen sich gezielt zusätzliche Unit-Tests entwickeln.
+
+Man unterscheidet:
+
+\begin{tabularx}{\linewidth}{l|X}
+Typ            & Verhältnis \\
+\hline
+{\textbf Statement Coverage} (Line Coverage) & Anzahl ausgeführte zu
+  vorhandene Anweisungen\\
+{\textbf Branch Coverage} & Anzahl ausgeführte zu vorhandene Verzweigungen\\
+{\textbf Condition Coverage} & Anzahl ausgeführte zu vorhandene
+Fallunterscheidungen \\
+{\textbf Function Coverage} & Anzahl ausgeführte zu vorhandene Funktionen\\
+\end{tabularx}
+
+\newslide
+Um die Messungen durchführen zu können, muss der Code entsprechend angepasst,
+oder ``instrumentiert'' werden. Dies kann grundsätzlich auf der Source-Code-
+oder (bei Java) auf der Byte-Code-Ebene geschehen. Das Open-Source-Werkzeug
+Cobertura fügt den notwendigen Code in den Byte-Code der Class-Dateien.
+Es kann auf mehrere Arten aufgerufen werden:
+von der Kommandozeile, mit Ant oder Maven.
+
+\newslide
+Bei Ant ist der Ausgangspunkt ist die Build-Datei, die wie folgt erstellt wird:
+\begin{enumerate}
+\item Man deklariert die Cobertura-Tasks \verb+cobertura-instrument+ und
+  \verb+cobertura-report+:
+  \begin{lstlisting}[language=xml,morekeywords={taskdef}]
+<taskdef classpath="cobertura.jar" resource="task.properties" />
+  \end{lstlisting}
+\newslide
+\item Man sorgt dafür, dass die Class-Dateien instrumentiert werden:
+  \begin{lstlisting}[language=xml,
+    morekeywords={cobertura,instrument,fileset,include,exclude}]
+<cobertura-instrument todir="instrument">
+   <fileset dir="build">
+      <include name="**/*.class" />
+      <exclude name="**/*Test.class" />
+   </fileset>
+</cobertura-instrument>
+  \end{lstlisting}
+  Damit werden die angepassten Dateien ins Verzeichnis intrument abgelegt.
+\newslide
+\item Bei der Test-Durchführung müssen neu die geänderten Dateien verwendet
+  werden:
+  \begin{lstlisting}[language=xml,morekeywords={junit,classpath}]
+<junit fork="yes" printsummary="true">
+  <classpath location="instrument" />
+  <classpath location="build" />
+  ...
+</junit>
+  \end{lstlisting}
+  Ausserdem muss das Attribut fork auf yes gesetzt werden.
+\newslide
+\item Anschliessend wird ein Report in HTML-Format erstellt:
+  \begin{lstlisting}[language=xml,morekeywords={cobertura,report}]
+<cobertura-report srcdir="src" destdir="coverage/html"/>
+  \end{lstlisting}
+\end{enumerate}
+%
+Mit Maven ist es auch hier wesentlich einfacher:
+\begin{lstlisting}[language=xml,
+  morekeywords={reporting,plugins,plugin,groupId,artifactId}]
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+\end{lstlisting}
+\ifslides
+  \includegraphics[width=0.9\linewidth]{qm/coverage}
+\else
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{qm/coverage}
+  \caption{Test-Coverage Report mit Cobertura}
+  \label{fig:cobertura}
+\end{figure}
+\fi
+%-------------------------------------------------------------------------
+\newpage
+\subsection{Continuous Integration}
+Mit dem Begriff ``Continuous Integration'' (abgekürzt CI) bezeichnet man das
+automatisierte, regelmässige und häufige Erstellen eines Softwaresystems während
+dessen Entwicklung. Damit kann auf einfachste Weise sichergestellt
+werden, dass
+\begin{itemize}
+\item allfällige Integrationsprobleme frühzeitig erkannt,
+\item alle benötigten Dateien eingecheckt und
+\item die vorhandenen Tests durchgeführt worden sind.
+\end{itemize}
+Eine Voraussetzung dafür ist, dass alle beteiligten
+Entwickler ihre Arbeitsergebnisse in entsprechend kurzen Intervallen (z.B
+einmal täglich) einchecken.
+\newslide
+Ein CI-Server sorgt dafür, dass neu eingecheckter Code einem
+periodischen Build- und
+Test-Zyklus unterzogen und dessen Ergebnisse auf einer Web-Seite und
+als RSS-Feed publiziert werden.
+Es ist zudem auch möglich diese per E-Mail an ausgewählte
+Adressen zu versenden.
+
+Dieses Verfahren wird auch ``Smoke Testing'' genannt, in
+Anlehnung an das Vorgehen bei der Hardware-Entwicklung, wenn nach
+erfolgter Bestückung einer Platine Spannung angelegt wird um
+festzustellen, ob irgendwo Rauch aufsteigt.
+
+\newslide
+Bekannte Vertreter von CI-Server-Systemen sind:
+\begin{itemize}
+\item CruiseControl \href{http://cruisecontrol.sourceforge.net}
+                        {cruisecontrol.sourceforge.net}
+\item Jenkins/Hudson \href{http://jenkins-ci.org}{jenkins-ci.org}
+\item Bamboo  \href{http://www.atlassian.com/software/bamboo}
+     {www.atlassian.com/software/bamboo}
+\item Continuum \href{http://continuum.apache.org}{continuum.apache.org}
+\item TeamCity  \href{http://www.jetbrains.com/teamcity}
+      {www.jetbrains.com/teamcity}
+%\item \ldots
+\end{itemize}
+%
+\newslide
+\subsubsection{CruiseControl}
+CruiseControl ist ein von ThoughtWorks in Java entwickelter
+CI-Server.
+CruiseControl kann mittels einer XML-Datei konfiguriert werden:
+\begin{lstlisting}[language=xml,
+morekeywords={cruisecontrol,project,bootstrappers,svnbootstrapper,modificationset,svn,schedule,ant}]
+<cruisecontrol>
+  <project name="connectfour">
+    <bootstrappers>
+      <svnbootstrapper
+                localWorkingCopy="projects/${project.name}" />
+    </bootstrappers>
+
+    <!-- checks for changes in SVN repository -->
+    <modificationset>
+      <svn/>
+    </modificationset>
+
+    <schedule interval="300">
+      <ant buildfile="projects/${project.name}/build.xml"/>
+    </schedule>
+..
+  </project>
+</cruisecontrol>
+\end{lstlisting}
+Hier wird beispielsweise in 5-Minuten-Intervallen das SVN-Repository
+des Projektes ``connectfour'' abgefragt und ein neuer Ant-Build
+ausgeführt, wenn sich Dateien geändert haben.
+\begin{figure}[H]
+%\includegraphics[width=\linewidth]{qm/bugkilla_cc}
+%  (\href{http://www.oio.de/cruisecontrol.htm}{www.oio.de/cruisecontrol.htm})}
+\includegraphics[width=\linewidth]{qm/cruisecontrol-dashboard}
+\caption{CruiseControl mit Dashboard}
+%
+\label{fig:cruisecontrol}
+\end{figure}
+\newslide
+Auch Maven wird unterstützt. Dazu dient das Element maven2, welches
+das Element ant in der Config-Datei ersetzt. Mit dem Attribut goal können die
+durchzuführenden Phasen angegeben werden und mit sitegoal die zu
+erstellende Dokumentation. Beispiel:
+\begin{lstlisting}[language=xml,morekeywords={maven2}]
+  <maven2 mvnhome="/usr/share/maven-bin-2.0"
+          pomfile="projects/${project.name}/pom.xml"
+	  goal="clean|install"
+	  sitegoal="site|site:deploy"
+	  flags="-B -e -Dsurefire.useFile=false -U" />
+\end{lstlisting}
+%$
+\newslide
+Die hier aufgelisteten Flags-Parameter sind den Empfehlungen von
+Brian Fox (Maven best practises
+  \href{http://www.sonatype.com}{www.sonatype.com}) entnommen.
+%(Maven best practises \href{http://www.sonatype.com/people/2009/01/maven-continuous-integration-best-practices}
+%      --> $
+\begin{center}
+\begin{tabular}{ll}
+ -B & Batch-Modus (kein interaktiver Modus)\\
+ -e & erzeugt Laufzeitfehlermeldungen (Stacktrace)\\
+ -Dsurefire.useFile=false & Konsolenausgabe der Unittest-Meldungen\\
+ -Dmaven.repo.local=xxxx & verwendet xxxx als lokales Maven-Repository\\
+ -U & prüft, ob aktualisierte Releases und Snapshots vorliegen\\
+\end{tabular}
+\end{center}
+\newslide
+Interessant und sehr praktisch ist auch die Fähigkeit von CruiseControl die
+erfolgreichen Build-Artefakte zum Download gleichfalls auf der Web-Seite
+anzubieten. Dazu muss lediglich die Config-Datei mit einem entsprechenden
+Publisher-Eintrag ergänzt werden:
+\begin{lstlisting}[language=xml,
+  morekeywords={publishers,onsuccess,artifactspublisher}]
+  <publishers>
+    <onsuccess>
+      <artifactspublisher
+            dest="artifacts/${project.name}"
+	    dir="${env.HOME}/.m2/repository/net/sampleproject"/>
+      </onsuccess>
+  <publishers>
+\end{lstlisting}
+Dabei muss darauf geachtet werden, dass das Dir-Attribut auf das
+korrekte Installationsverzeichnis zeigt, und dass beim
+Maven-Buildprozess auch wirklich eine Installation durchgeführt wird.
+%
+% http://www.javaworld.com/javaworld/jw-12-2008/jw-12-hudson-ci.html
+\subsubsection{Jenkins}
+Jenkins wurde ursprünglich bei Sun Microsystems von Kohsuke Kawaguchi
+auf Open-Source-Basis unter dem Namen Hudson entwickelt. Nach der
+Übernahme von Oracle hat Kawaguchi das Unternehmen verlassen und das
+Projekt in Jenkins umbenannt. Obwohl Oracle Hudson ebenfalls
+weiterentwickeln will, scheint das Jenkins-Projekt breitere
+Unterstützung  zu finden.
+Es gibt zahlreiche Projekte, die Plugin-Module
+für Jenkins entwickeln und damit dessen Funktionalität erheblich
+erweitern.
+
+Jenkins kann auf 2 Arten betrieben werden:
+\begin{itemize}
+\item als eigenständiger Server: \verb+java -jar jenkins.war+
+\item als Web-Applikation (Glassfish, JBoss, Jetty, Tomcat, WebSphere,
+  \ldots)
+\end{itemize}
+Jenkins wird im wesentlichen mit einer Web-Oberfläche verwaltet:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{qm/jenkins}
+  \caption{Jenkins GUI (Quelle: J. Ferguson Smart)}
+  \label{fig:jenkins}
+\end{figure}
+Als weitere Schnittstelle wird REST sowie ein
+Konsolen-Client angeboten.
+
+Jenkins unterscheidet die folgenden Projekt-Typen:
+\begin{itemize}
+\item Free-Style-Projekt: ausführen von Funktionen, die in Shell-,
+  Windows Batch- oder Ant-Skripts enthalten sind,
+\item Maven-2-Projekt: Durchführung eines Maven-Build-Prozesses,
+\item Multikonfigurationsprojekt: mehrfache Durchführung
+  eines Builds für unterschiedliche Konfigurationen (Matrix-Build).
+\end{itemize}
+Die Auslösung eines Build-Vorganges kann auf verschiedene Weise
+geschehen:
+\begin{itemize}
+\item nachdem ein Build-Vorgang beendet ist,
+\item in periodischen Intervallen: MIN HOUR DOM MONTH DOW
+\item bei Änderungen im SCM
+\item explizit
+\end{itemize}
+% John Ferguson Smart
+%\href{http://www.wakaleo.com/public_resources/continuous-integration-with-hudson.pdf}
+%\newslide
+%\subsubsection{Aufgabe}
+%Ein Maven-basiertes Projekt soll von einem CI-Server überwacht
+%werden.
+%Nehmen Sie ein geeignetes System in Betrieb und sorgen Sie dafür,
+%dass die Junit- und Checkstyle-Reports nach einem Build jeweils
+%angezeigt werden.
+%
+%Tipp:
+%\href{http://cruisecontrol.sourceforge.net/gettingstartedsourcedist.html#Modifying_the_HTML_Reports}{cruisecontrol.sourceforge.net/gettingstartedsourcedist.html\#Modifying\_the\_HTML\_Reports}
+%
+%\newpage
+\newslide
+\subsection{Speichertests mit Valgrind}
+Valgrind ist ein Open-Source-Tool für das Auffinden von
+Speicher-Managementproblemen in Linux-x86-Programmen:
+\begin{itemize}
+\item nicht-initialisierter Speicher
+\item Zugriffe auf bereits freigegebenen Speicher
+\item Bereichsüberschreitungen
+\item nicht freigegebener Speicher
+\item Unkorrekte Verwendung von malloc/new/new[] versus free/delete/delete[]
+\end{itemize}
+Valgrind hat den ``Open Source Award 2004'' gewonnen und wird im
+KDE-Projekt ausgiebig eingesetzt. Der Gebrauch ist recht einfach. Valgrind
+wird einfach beim Aufstarten des  zu testenden Programmes auf der
+Kommandozeile vor den Programmnamen gesetzt:
+\begin{verbatim}
+linux> valgrind --tool=memcheck ./mein_program
+\end{verbatim}
+Beispiel:
+{
+\ifslides\footnotesize
+\else\small
+\fi
+\begin{verbatim}
+==15506== Memcheck, a memory error detector for x86-linux.
+==15506== Copyright (C) 2002-2004, and GNU GPL'd, by Julian Seward et al.
+==15506== Using valgrind-2.2.0, a program supervision framework for x86-linux.
+==15506== Copyright (C) 2000-2004, and GNU GPL'd, by Julian Seward et al.
+==15506== For more details, rerun with: -v
+==15506==
+==15506== Invalid write of size 1
+==15506==    at 0x8048AED: Sstring::Sstring(char const*) (my_prog.cc:8)
+==15506==    by 0x804885D: main (my_prog.cc:29)
+==15506==  Address 0x1BB3F046 is 0 bytes after a block of size 30 alloc'd
+==15506==    at 0x1B9071D5: operator new[](unsigned) (vg_replace_malloc.c:139)
+==15506==    by 0x8048ABF: Sstring::Sstring(char const*) (my_prog.cc:7)
+==15506==    by 0x804885D: main (my_prog.cc:29)
+..
+\end{verbatim}
+}
+\ifslides
+\else
+Die Zahl zwischen den beiden Gleichheitszeichen bezeichnet die Prozessnummer.
+\fi
+%
+\newpage
+\subsection{GUI-Tests mit Abbot und FEST}
+Das Testen von grafischen Benutzeroberflächen
+ist meist eine heikle Angelegenheit. Hauptsächlich hat dies
+damit zu tun, dass bereits kleine Layout-Änderungen bei
+automatisierten Tests zu unerwarteten Störungen führen können.
+Teilweise kann dies zwar umgangen werden,
+indem man Layout-bezogene Tests nach Möglichkeit vermeidet. Trotzdem, auf
+händisch durchgeführte Tests kann bei GUI-Tests meist nicht verzichtet werden.
+
+\newslide
+Man unterscheidet grundsätzlich zwei Verfahren:
+\begin{enumerate}
+\item GUI-Unit-Tests: Tests werden entwickelt, bevor GUI-Code
+  vorhanden ist. Beispiel:
+\begin{lstlisting}[language=java]
+public class CelsiusConverterTest extends TestCase {
+  public void testConversion(){
+    CelsiusConverter conv = new CelsiusConverter();
+    conv.tempCelsius.setText("35");
+    conv.convertTemp.doClick();
+    assertEquals(conv.fahrenheitLabel.getText(),"95 Fahrenheit");
+  }
+}
+\end{lstlisting}
+\newslide
+\item Record/Playback (Capture/Replay): bestimmte Bedienungsabläufe werden
+in Skriptform aufgezeichnet. Danach wird das Skript
+an ausgewählten Stellen mit Testbedingungen ergänzt. Die
+Testdurchführung kann damit automatisiert ablaufen.
+\end{enumerate}
+\begin{minipage}{0.48\linewidth}
+\ifslides
+\else
+Beispiel Abbot:
+\fi
+\begin{enumerate}
+\item Starten des Script-Editors Costello:
+\begin{lstlisting}
+  % java -jar lib/costello.jar
+\end{lstlisting}
+\item Ein neues Skript erstellen:
+
+  File $\longrightarrow$ New Script
+\item Eingabe der ``Launch''-Information:
+
+\begin{tabular}{ll}
+  Target Class Name & CelsiusConverter\\
+  method & main \\
+  Arguments & \verb+[]+\\
+ Classpath & \\
+\end{tabular}
+\item Starten der Test-Applikation:
+
+   Test $\longrightarrow$ Launch
+\item Beginn der Aufzeichnung:
+
+  Capture $\longrightarrow$ All Actions
+\setcounter{saveenum}{\value{enumi}}
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{qm/celsius}
+\end{center}
+\vspace{1cm}
+
+\hfill\includegraphics[width=0.9\linewidth]{qm/abbot}\\
+\caption{GUI-Test mit Abbot}
+\end{figure}
+\end{minipage}
+
+\begin{enumerate}
+\setcounter{enumi}{\value{saveenum}}
+\item Den Wert ``35'' im CelsiusConverter-Dialog eingeben und anschliessend
+  ``Convert'' aktivieren.
+\item Die Zeile ``ActionMap(Convert,pressed)'' selektieren.
+\item Im Hierarchy-Fenster den Eintrag ``95 Fahrenheit (JLabel)'' selektieren.
+\item Im Properties-Fenster die Zeile ``text  95 Fahrenheit'' selektieren.
+\item Den Button ``Assert equals'' aktivieren.
+\item Ausführen des Tests: ``Run'' aktivieren.
+\item Script abspeichern: File $\longrightarrow$ Save as \ldots
+\item Filename ``CelsiusConverterTest.xml'' eingeben.
+\item Test ausführen:
+  \begin{lstlisting}
+  % java -cp lib/costello.jar junit.extensions.abbot.ScriptFixture \
+       CelsiusConverterTest.xml
+  \end{lstlisting}
+\end{enumerate}
+%
+Das Projekt
+FEST-Swing
+(Fixtures for Easy Software Testing) stellt aufbauend auf Abbot
+ein API zur Verfügung, welches das Erstellen und Pflegen von GUI-Tests
+vereinfacht. Es zeichnet sich durch die folgenden Eigenschaften aus:
+\begin{enumerate}
+  \item Simulation
+  der Benutzereingaben (Mauszeiger- und Tastatur-Ereignisse),
+  \item robuster Zugriff auf GUI-Komponenten mittels verschiedener
+    Suchverfahren: nach Typ, Name oder nach benutzerdefinierten Kriterien,
+  \item Unterstützung sämtlicher Swing-Komponenten der JDK,
+  \item kompaktes und leistungsfähiges API für die Erstellung und
+    Anpassung funktionaler GUI-Tests,
+  \item Möglichkeit Dialogabbildungen fehlgeschlagener Tests in die
+  Testreports einzubinden,
+  \item kann sowohl mit JUnit wie auch TestNG verwendet werden.
+  \end{enumerate}
+Beispiel:
+  \begin{lstlisting}[language=java]
+public class FestSearchTest extends TestCase {
+  private FrameFixture window;
+
+  public void setUp(){
+    SearchPanel sp = new SearchPanel();
+    JFrame dialog = new JFrame("Bibliographic System - TEST");
+    dialog.getContentPane().add(sp);
+    window = new FrameFixture(dialog);
+    window.show();
+  }
+
+  public void tearDown() {
+    window.cleanUp();
+  }
+
+  public void testSearch(){
+    window.textBox("queryField").enterText("a");
+    window.button("findButton").click();
+    window.textBox("queryField").requireText("a");
+  }
+}
+\end{lstlisting}
+%
+%\subsubsection{Aufgabe}
+%Führen Sie die notwendigen Anpassungen durch,
+%so dass mit der Klasse FestSearchTest getestet
+%werden kann, ob die Tabelle resultTable des Search-Dialogfensters
+%nach einer Such-Abfrage die korrekten
+%Einträge anzeigt.
+%
+\newpage
+TODO: Include WEBTEST
+\newpage
+\input{content/webtest}
+%
+\subsection{Belastungstests mit JMeter}
+Mit JMeter, einem Java-basierten, Open-Source Tool aus dem
+Apache/Jakarta-Projekt,  ist es möglich das Lastverhalten von
+Client-Server-Applikationen zu testen.
+%Nach dem Aufstarten von JMeter
+%erscheint das folgende Dialogfenster:
+%\begin{figure}[H]
+%\includegraphics[width=\linewidth]{jmeter0}
+%\caption{Dialogfenster von JMeter}
+%\end{figure}
+
+Als erstes erstellt man mit JMeter einen Testplan, der den Testablauf
+beschreibt. Ein Testplan muss mindestens eine ``Thread Group'' enthalten.
+Die Thread-Group bildet den Startpunkt des Testablaufes.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{qm/jmeter-threadgroup}
+\caption{Dialogfenster von JMeter}
+\end{figure}
+\newslide
+Eine Thread-Group enthält die folgenden Attribute:
+\begin{itemize}
+\item Name: der Name der Thread Group,
+\item Number of Threads: jeder Thread entspricht einem einzelnen
+  Benutzer,% Wenn man z.B. 10 Benutzer simulieren will, gibt man hier 10 ein.
+\item Ramp-Up Period: Zeitdauer bis alle Threads erzeugt sind,
+\item Loop Count: Anzahl Wiederholungen des Testablaufes (nur wenn nicht
+  ``forever'')
+\item Scheduler: hier können zusätzliche Parameter zur zeitlichen Steuerung des
+  Tests eingegeben werden.
+\end{itemize}
+Nun kann man die weiteren Elemente eingeben, zum Beispiel Logic Controllers zur
+Steuerung des Ablaufes, Samplers für die Erzeugung von Anfragen, Timers für
+die zeitliche Verzögerung zweier aufeinanderfolgender Anfragen etc.
+
+\newslide
+Die folgende Liste zeigt ein Beispiel eines JMeter-Testplanes:
+\begin{itemize}
+\item Thread Group
+  \begin{itemize}
+    \item Once Only Controller
+      \begin{itemize}
+        \item Login Request (an HTTP Request )
+      \end{itemize}
+      \item Load Search Page (HTTP Sampler)
+      \item Interleave Controller
+      \begin{itemize}
+        \item Search ``A'' (HTTP Sampler)
+        \item Search ``B'' (HTTP Sampler)
+        \item HTTP default request (Configuration Element)
+      \end{itemize}
+      \item HTTP default request (Configuration Element)
+      \item Cookie Manager (Configuration Element)
+      \item Graph results (Listener Element)
+  \end{itemize}
+\end{itemize}
+Der ``Once Only Controller'' sorgt dafür, dass der
+``Login Request'' nur beim  ersten Mal ausgeführt wird. Anschliessend wird
+jedoch bei jedem Testdurchlauf eine Web-Seite mit einigen Feldern zum Suchen
+von Informationen angefordert. Der ``Interleave Controller'' schliesslich
+sendet abwechselnd je einen HTTP-Request an den Web-Server. Dabei wird ein
+``default request''-Element verwendet, mit welchem die gemeinsamen Werte beider
+HTTP-Such\-an\-for\-der\-ungen definiert sind. Die leeren Felder werden dann durch die
+entsprechenden Werte ersetzt. Es empfiehlt sich, bei einem HTTP-Request das
+Domain-Feld leer zu lassen und statt dessen den Wert in einem
+Default-Request-Element zu setzen. Ebenso sollte man bei Web-Tests einen
+Cookie-Manager einsetzen. Cookies werden sonst von JMeter abgelehnt.
+Mit einem Listener-Element können die gesammelten Daten sichtbar gemacht und
+in ein File abgespeichert werden.
+%
+\newpage
+\subsection{Profiling}
+Zur Verbesserung und Optimierung der Laufzeiteigenschaften ist es nützlich, die
+Verteilung der CPU-Nutzung auf die einzelnen Programmteile ermitteln zu
+können. Hierzu gibt es verschiedene, meist kommerzielle Werkzeuge. Für einfache
+Profiling-Untersuchungen bietet jedoch auch der von Sun mitgelieferte
+Profiler hprof gute Dienste. Dazu startet man das Programm mit der
+VM-Option \verb+-Xrunhprof+ und weiteren Parametern. Zum Beispiel:
+\begin{lstlisting}
+% java -Xrunhprof:cpu=samples,depth=10 drawing.Scribble
+\end{lstlisting}
+\newslide
+Die möglichen Parameter und ihre Werte sind:
+
+\begin{tabular}{lll}
+cpu & samples,times & Messung der Rechenzeit \\
+heap & dump,sites,all & Speicherbelegung\\
+file & {\em name} & Name des Ausgabedatei \\
+depth & {\em n}   & maximale Tiefe des Stacktraces \\
+help &           & Hilfeanzeige \\
+\end{tabular}
+
+Während bei der Methode samples das Programm in regelmässigen
+Intervallen unterbrochen und ein Stack-Abbild gemacht wird, sorgt die Methode
+times bei allerdings erheblich verlangsamter Ausführung für eine genaue
+Messung der Laufzeit.
+\ifslides
+\newpage
+\fi
+Dabei entsteht die in 3 Abschnitte gegliederte Textdatei
+java.hprof.txt:
+\begin{itemize}
+\item Allgemeine Erläuterungen
+\item Stack-Abbilder
+\item Laufzeit-Statistik
+\end{itemize}
+\ifslides
+\newpage
+\else
+Im Buch ``Handbuch der Java-Programmierung'' (Guido Krüger) wird dieses
+Verfahren anhand der folgenden Klasse gezeigt:
+\fi
+\begin{lstlisting}[language=java]
+public class ProfTest {
+    public static String dots(int len){
+        String ret = "";
+        for (int i = 0; i < len; ++i) {
+            ret += ".";
+        }
+        return ret;
+    }
+
+    public static void main(String[] args){
+        String s = dots(10000);
+        System.out.println(s);
+    }
+}
+\end{lstlisting}
+\ifslides
+\newpage
+\fi
+Es resultiert daraus die folgende Statistik:
+{
+\ifslides\footnotesize
+\else\small
+\fi
+\begin{lstlisting}
+CPU SAMPLES BEGIN (total = 291) Sun Sep 18 10:25:13 2005
+rank   self  accum   count trace method
+   1 85.57% 85.57%     249    23 java.lang.StringBuffer.expandCapacity
+   2  2.06% 87.63%       6    24 ProfTest.dots
+   3  1.03% 88.66%       3    22 java.lang.StringBuffer.<init>
+   4  0.69% 89.35%       2    34 java.io.FileOutputStream.writeBytes
+   5  0.69% 90.03%       2     3 sun.misc.URLClassPath$JarLoader.getJarFile
+
+\end{lstlisting}
+}
+\ifslides
+\newpage
+\else
+Sie zeigt deutlich, dass mit mehr als 80\% der wesentliche Anteil der Samples
+die Methode expandCapacity() der StringBuffer-Klasse betrifft.
+
+Verwendet man anstelle der String-Klasse den StringBuffer und passt die
+Methode dots entsprechend an:
+\fi
+\begin{lstlisting}[language=java]
+   public static String dots(int len){
+        StringBuffer sb = new StringBuffer( len + 10 );
+        for (int i = 0; i < len; ++i) {
+            sb.append('.');
+        }
+        return sb.toString();
+    }
+\end{lstlisting}
+\ifslides
+\newpage
+\fi
+dann sieht das Ergebnis wesentlich besser aus:
+{\ifslides\footnotesize
+\else\small
+\fi
+\begin{lstlisting}
+CPU SAMPLES BEGIN (total = 29) Sun Sep 18 10:48:06 2005
+rank   self  accum   count trace method
+   1 17.24% 17.24%       5    21 java.io.FileOutputStream.writeBytes
+   2 13.79% 31.03%       4    19 java.io.FileOutputStream.writeBytes
+..
+\end{lstlisting}
+}
+Statt 291 Samples gibt es jetzt nur noch 29 Samples. Das Programm ist demnach
+10 mal schneller geworden.
+%
+\newpage
+\subsection{Abnahmetests (Acceptance Testing)}
+Der Nachweis, dass die
+Benutzeranforderungen erfüllt sind, wird durch
+das ``Acceptance Testing'' erbracht.
+Es ist typischerweise eine Aufgabe des Auftraggebers und wird oft
+auf der Basis von ausgewählten Use-Cases in mehr oder weniger
+aufwändiger Handarbeit durchgeführt. Legt man Wert auf Reproduzierbarkeit,
+dann sollte man sich auch hier nach Möglichkeiten zur Automatisierung
+umschauen. Geeignete Werkzeuge zeichnen sich dadurch aus, dass
+sie sich am Anwendungsumfeld orientieren. Idealerweise sind es sogar die
+Benutzer selbst, die die Testfälle spezifizieren.
+
+\newslide
+Einige Beispiele mit Open-Source-Lizenzen:
+\begin{itemize}
+\item FIT (Framework for Integrated Tests)/FitNesse
+    \href{http://fit.c2.com}{fit.c2.com}
+\item Cucumber  \href{http://cukes.info}{cukes.info}
+\item Concordion \href{http://www.concordion.org}{www.concordion.org}
+\item JBehave  \href{http://jbehave.org}{jbehave.org}
+\item easyb  \href{http://code.google.com/p/easyb}
+    {code.google.com/p/easyb}
+\item RobotFramework \href{http://code.google.com/p/robotframework}
+   \href{code.google.com/p/robotframework}
+\end{itemize}
+\newslide
+In diesem Zusammenhang hat sich das Konzept ``Behavior-Driven
+Development'' von Dan North (2006) etabliert, das er als eine Verbindung von
+Test-Driven- und Domain-Driven Development bezeichnet. Die Testfälle
+werden in einer der natürlichen Sprache möglichst naheliegenden
+Sprache, einer sogenannten DSL (Domain-Specific Language), beschrieben:
+
+\structure{Given} some initial context (the givens),\\
+\structure{When} an event occurs,\\
+\structure{Then} ensure some outcomes.
+\newslide
+%
+\subsubsection{Fit}
+Fit ist ein Open-Source-Tool für Abnahme- und Systemtests, das
+darauf ausgerichtet ist, dass die Tests von Benutzern ohne tiefgehende
+Informatikkenntnisse definiert werden können.
+Fit (Framework for Integrated Tests) wurde vom Wiki-Erfinder Ward Cunningham
+2002 zunächst als reines Java-Tool entwickelt. Mittlerweile existieren
+Versionen für C\#, Python, Perl, Smalltalk und C++.
+
+\ifslides
+\newslide
+\underline{Vorgehen:}
+\else
+Der prinzipielle Ablauf ist in Abbildung \ref{fig:fit-test-procedure}
+dargestellt.
+\fi
+\begin{enumerate}
+\item Mit einem gängigen Editor oder einem
+Tabellenkalkulationsprogramm wird ein Dokument erstellt, welches für jeden
+Test eine oder mehrere Tabellen enthält.
+Dieses Dokument wird anschliessend in HTML-Format abgespeichert.
+
+\includegraphics[width=0.35\linewidth]{qm/xfig/testcase-table}
+\hfill
+\includegraphics[width=0.45\linewidth]{qm/xfig/testcase-table-html}
+%Leider speichert
+%der Wordprocessor von OpenOffice (bis und mit Version 2.2)
+%die Kopfzeilen von Tabellen (richtigerweise) in th-Elementen ab,
+%womit Fit seltsamerweise nichts anfangen kann. Mit MS-Word/Excel
+%(oder einer Nach-Editierung) resp. dem Spreadsheet von OpenOffice funktionierts.
+\newslide
+\item Nun müssen zu jeder Tabelle entsprechende
+Fixtures (Spannvorrichtungen) implementiert werden. Das sind Klassen, die
+zur Tabelle passende Methoden anbieten und dabei den zu testenden Programmcode
+aufrufen.
+\begin{lstlisting}[language=java]
+public class Browser extends fit.Fixture {
+    public void library (String path) throws Exception {
+        MusicLibrary.load(path);
+    }
+
+    public int totalSongs() {
+        return MusicLibrary.library.length;
+    }
+}
+\end{lstlisting}
+\newslide
+\item Anschliessend können die Tests mit einem einfachen
+Kommandozeilenaufruf:
+\begin{verbatim}
+% java fit.FileRunner input.html output.html
+37 right, 10 wrong, 0 ignored, 2 exceptions
+\end{verbatim}
+ausgeführt werden. Dabei wird die Datei input.html gelesen, die
+entsprechenden Tests durchgeführt,
+die Test-Ergebnisse in HTML-Format
+in die Ausgabedatei
+geschrieben und auf der Konsole die Zusammenfassung ausgegeben.
+\end{enumerate}
+
+\begin{center}
+\includegraphics[width=0.45\linewidth]{qm/xfig/testcase-result-html1}
+\end{center}
+\newslide
+Mit Ant kann dafür auch ein Build-Target verwendet werden:
+\begin{lstlisting}[language=xml,morekeywords={target,java,arg,classpath}]
+
+   <target name="run"  description="Run Fit">
+    <java classname="fit.FileRunner" fork="yes">
+          <arg value="input.html"/>
+          <arg value="output.html"/>
+          <classpath refid="compile.classpath"/>
+          <classpath>
+              <pathelement path="${build.dir}"/>
+          </classpath>
+      </java>
+   </target>
+
+\end{lstlisting}
+%$
+\newslide
+\begin{figure}[H]
+  \centering
+\ifslides
+  \includegraphics[width=0.7\linewidth]{qm/xfig/fit}
+\else
+  \includegraphics[width=\linewidth]{qm/xfig/fit}
+\fi
+  \caption{Test-Ablauf mit Fit}
+  \label{fig:fit-test-procedure}
+\end{figure}
+\newslide
+Fit unterscheidet unterschiedliche Typen von Fixtures und damit
+korrespondierenden Tabellen:
+\begin{itemize}
+\item \structure{ColumnFixture}: Überprüfung von Regeln und Berechnungen
+
+Die Tabelle besteht aus einer Titelzeile mit dem Klassennamen der Fixture,
+einer Kopfzeile mit den Namen der Testdatenparameter und den Zeilen mit den
+Testdaten. Ausgaben werden von Eingaben dadurch unterschieden, dass dem
+Parameternamen ein Klammerpaar \verb+()+ angehängt wird:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|l|}{\em class name}\\
+\hline
+{\em param name 1} & {\em param name 2}& {\em \ldots} \\
+\hline
+{\em value} & {\em value}& {\em \ldots} \\
+\ldots & \ldots & \ldots \\
+\hline
+\end{tabular}
+\end{center}
+Die Fixture-Klasse muss von fit.ColumnFixture abgeleitet sein, für alle
+Eingabeparameter ein gleichbenanntes öffentliches Attribut und für
+die Ausgaben eine entsprechende öffentliche Methode enthalten.
+%
+\newslide
+\item \structure{RowFixture}: Überprüfung von Datensätzen
+
+Die Tabelle besteht aus einer Titelzeile mit dem Klassennamen der Fixture,
+einer Kopfzeile mit den
+Attributbezeichnern des Datensatzes und mehreren Zeilen mit Werten,
+wobei die erste Spalte die jeweiligen Schlüsselwerte enthält:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|l|}{\em class name}\\
+\hline
+{\em key name} & {\em attr name 1}& {\em \ldots} \\
+\hline
+{\em key value} & {\em value}& {\em \ldots} \\
+\ldots & \ldots & \ldots \\
+\hline
+\end{tabular}
+\end{center}
+Die Fixture-Klasse muss von RowFixture abgeleitet sein und
+die Methoden query und getTargetClass implementiert haben.
+Die query-Methode soll die Ergebnisliste zurückgeben und getTargetClass die
+Klasse der Ergebnisobjekte. Diese Klasse muss alle in der Tabelle
+aufgelisteten Atttribute öffentlich anbieten.
+%
+\newslide
+\item \structure{ActionFixture}: Ausführung einer Sequenz von Anweisungen
+
+Die Tabelle besteht aus einer Titelzeile mit dem Klassennamen
+fit.ActionFixture und Zeilen mit zwei resp. drei Spalten:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|l|}{\textbf fit.ActionFixture}\\
+\hline
+{\em action} & {\em method}& {\em value} \\
+\ldots &  & \\
+\hline
+\end{tabular}
+\end{center}
+Es stehen die folgenden Aktionen zur Verfügung:
+\begin{itemize}
+\item start: Erzeugung des Test-Objektes
+\item enter: Aufruf von set-Methoden
+\item check: Aufruf von get-Methoden und Vergleich mit Sollwert.
+\item press: Aufruf von void-Methoden
+\end{itemize}
+\end{itemize}
+Nebst diesen in der Fit-Library enthaltenen können auch eigene Fixture-Klassen
+geschrieben werden.
+%
+\newslide
+%\subsubsection{Integrationstests mit Maven}
+
+Mit Hilfe des Plugins fit-maven-plugin können in der Phase
+integration-test Akzeptanztests auf der Basis von Fit durchgeführt werden.
+\begin{lstlisting}[language=xml,
+morekeywords={plugin,groupId,artifactId,configuration,sourceDirectory,outputDirectory}]
+<plugin>
+  <groupId>com.googlecode.refit.maven</groupId>
+  <artifactId>refit-maven-plugin</artifactId>
+  <version>1.7.1</version>
+
+  <configuration>
+    <sourceDirectory>src/test/resources</sourceDirectory>
+    <outputDirectory>target/fit</outputDirectory>
+  </configuration>
+</plugin>
+\end{lstlisting}
+Mit der obigen Konfiguration werden alle im Verzeichnis src/test/fit
+abgelegten HTML-Dateien als Eingabe-Argument
+ dem Programm fit.FileRunner übergeben. Die Ergebnisdateien werden
+ anschliessend ins Verzeichnis target/fit geschrieben.
+\newslide
+\subsubsection{FitNesse}
+FitNesse ist ein auf Fit basierendes WIKI-System zur Spezifikation von
+Anforderungen und Testfällen.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{qm/fitnesse-frontpage}
+\caption{Titelseite von FitNesse}
+\end{center}
+\end{figure}
+\newslide
+Nach einer kurzen Einführung sind Benutzer in der Lage mit diesem System
+Web-Seiten zu erstellen,
+die ausführbare Testfälle enthalten:
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{qm/fitnesse-browsemusic}
+\caption{Eine Testseite von FitNesse}
+\end{center}
+\end{figure}
+\newslide
+Dazu muss man sich nur ein paar
+ wenige Formatierungsanweisungen merken. Zum Beispiel die Definition von
+ Tabellen, die den Konzepten von Fit folgen:
+\begin{verbatim}
+!|fit.ActionFixture|
+|start| eg.music.Browser|
+|enter| library |/home/tar/workspace/music/data/Music.txt|
+|check| total songs |37|
+\end{verbatim}
+Mittels vertikalen Strichen werden die Spalten und mit path der Klassenpfad
+festgelegt:
+\begin{verbatim}
+!path /home/tar/workspace/music/bin
+!path fitnesse.jar
+\end{verbatim}
+Schliesslich muss mit Properties noch die Eigenschaft Test dieser Seite
+hinzugefügt und der Test kann ausgeführt werden, sofern die benötigten
+Fixture-Klassen implementiert sind.
+%
+\newslide
+\subsubsection{JBehave}
+JBehave wurde von Dan North entwickelt, weil er zeigen wollte, wie man
+Testspezifikationen lesbarer und übersichtlicher machen kann.
+
+Vorgehen:
+\begin{enumerate}
+\item Man beschreibt in Textdateien die Testfälle in der
+BDD-typischen Gherkin-Syntax
+  (Beispiel: \lstinline{music_library_scenarios.story})
+\begin{lstlisting}[morekeywords={Given, When, And, Then}]
+Scenario:  Basic functionality of a Music Library
+
+Given the music library data/Music.txt
+When the total of songs is queried
+Then the resulting element should be 37
+\end{lstlisting}
+\newslide
+\item Man erstellt die passenden Step-Klassen:
+  \begin{lstlisting}[language=java]
+public class MusicLibrarySteps {
+    int totalSongs;
+
+    @Given("the music library $file")
+    public void openLibrary( String file ) {
+      ...
+    }
+    @When("the total of songs is queried")
+    public void queryTotalSongs() {
+      totalSongs=37;
+    }
+    @Then("the resulting element should be $result")
+    public void theResultingElementShouldBe(int result) {
+    	assertThat(totalSongs, equalTo(result));
+    }
+}
+  \end{lstlisting}
+\item Man erstellt die JUnitStory-Klasse passend zur Story-Datei
+  \begin{lstlisting}[language=java]
+public class MusicLibraryScenarios extends JUnitStory {
+  @Override
+  public Configuration configuration() {
+    return new MostUsefulConfiguration()
+    // where to find the stories
+    .useStoryLoader(new LoadFromClasspath(this.getClass()))
+    // CONSOLE and TXT reporting
+    .useStoryReporterBuilder(new StoryReporterBuilder()
+    .withDefaultFormats()
+    .withFormats(Format.CONSOLE, Format.TXT));
+  }
+
+  // Here we specify the steps classes
+  @Override
+  public List<CandidateSteps> candidateSteps() {
+    // varargs, can have more that one steps classes
+    return new InstanceStepsFactory(configuration(),
+                new MusicLibrarySteps()).createCandidateSteps();
+  }
+  \end{lstlisting}
+\item Man führt die Tests mit dem Junit-Testrunner aus.
+\end{enumerate}
+\newslide
+\subsubsection{Concordion}
+Einen ähnlichen Ansatz wie Fit verfolgt Concordion. Die Testfälle
+werden in HTML-Format abgelegt und anschliessend von den
+Entwicklern mit speziellen Ausführungsanweisungen und
+passenden Fixture-Klassen ergänzt. Zur Testausführung wird
+JUnit verwendet und die Ergebnisse werden als HTML-Dokument abgespeichert.
+
+\begin{centering}
+\includegraphics[width=0.8\linewidth]{qm/concordion-itemRefund}
+\end{centering}
+%
+
+\subsection{Aufgaben}
+\begin{enumerate}
+\item Erg"anzen Sie das \verb|LED WebApp| Projekt mit einem Logger.
+\item Implementieren Sie an einer geeigneten Stelle im \verb|LED WebApp| Projekt
+eine Assertion.
+\item Schreiben Sie einen Junit Test f"ur die Methoden \verb|convertTimeStamp| und
+\verb|getTimeStamp| der Klasse \verb|TSUtil|.
+\item Verwenden Sie eine geeignete Software um zu pr"ufen, zu wie viel Prozent Ihr
+Code mit Tests abgedeckt ist.
+\item Schreiben Sie zum \verb|LED WebApp| Projekt einen einfachen Test, um die Web Applikation
+automatisch zu pr"ufen.
+\item Implementieren Sie eine M"oglichkeit, den GPIO Teil von Rasperry PI mit eine MOCK Klasse.
+\end{enumerate}
+
+\newslide
+\subsection{Software und weitere Informationen}
+\begin{itemize}
+\item Software Testing Portal:
+\href{http://en.wikipedia.org/wiki/Portal:Software_Testing}
+{en.wikipedia.org/wiki/Portal:Software\_Testing}
+\item Checkstyle: \href{http://checkstyle.sourceforge.net/}
+                         {checkstyle.sourceforge.net/}
+\item Log4J: \href{http://logging.apache.org}{logging.apache.org}
+\item JUnit \href{http://junit.org}{junit.org}
+\item TestNG \href{http://testng.org}{testng.org}
+\item EasyMock \href{http://www.easymock.org}{www.easymock.org}
+\item Mockito \href{http://mockito.org}{mockito.org}
+\item Using Mock Objects in Java (Keld H. Hansen):
+
+  \href{http://javaboutique.internet.com/tutorials/mock_objects}
+  {javaboutique.internet.com/tutorials/mock\_objects}
+\item Unit Testing with Mock Objects (Ben Teese)
+
+\href{http://www.shinetech.com/display/www/Unit+Testing+with+Mock+Objects}
+   {www.shinetech.com/display/www/Unit+Testing+with+Mock+Objects}
+
+\item Designing Testability with Mock Objects (Mario Aquino)
+
+\href{http://www.ociweb.com/jnb/jnbJun2003.html}
+  {www.ociweb.com/jnb/jnbJun2003.html}
+
+\item jMock: a library for testing Java code using mock objects
+
+\href{http://jmock.org/index.html}{jmock.org/index.html}
+
+%\item Ant: \href{http://ant.apache.org}{ant.apache.org}
+\item Cobertura (Java test coverage)
+ \href{http://cobertura.sourceforge.net}
+         {cobertura.sourceforge.net}
+\item EMMA (Java test coverage)
+  \href{http://emma.sourceforge.net}{emma.sourceforge.net}
+\item Abbot (framework for automated testing of Java GUI
+  components and programs):
+  \href{http://abbot.sourceforge.net}{abbot.sourceforge.net}
+\item FEST-Swing \href{http://fest.easytesting.org/}
+{fest.easytesting.org/}
+%\item Jacareto (Java GUI Test ):
+%     \href{http://jacareto.sourceforge.net}{jacareto.sourceforge.net}
+\item Marathon (Java GUI Test Framework):
+   \href{http://marathonman.sourceforge.net}{marathonman.sourceforge.net}
+\item JAMon (Performance Tuning and Scalability Measuring):
+  \href{http://www.jamonapi.com}{www.jamonapi.com}
+\item JUnitPerf (Performance and Scalability testing with JUnit)
+  \href{http://clarkware.com/software/JUnitPerf.html}{clarkware.com/software/JUnitPerf.html}
+%\item EJP (Extensible Java Profiler):
+%  \href{http://ejp.sourceforge.net}{ejp.sourceforge.net}
+\item Test and Performance Tools Platform:
+  \href{http://www.eclipse.org/tptp}{www.eclipse.org/tptp}
+\item The Grinder (Java Load Testing Framework):
+   \href{http://grinder.sourceforge.net}{grinder.sourceforge.net}
+\item Valgrind: (Speichertests)
+    \href{http://valgrind.org/}{valgrind.org/}
+\item C/C++ Unittesting
+  HOWTO:
+\href{http://www.sipfoundry.org/developer-tools/c/c-unittesting-howto.html}
+              {www.sipfoundry.org/developer-tools/c/c-unittesting-howto.html}
+\item DseWiki: Speicher Checker:
+  \href{http://www.wikiservice.at/dse/wiki.cgi?SpeicherChecker}
+    {www.wikiservice.at/dse/wiki.cgi?SpeicherChecker}
+\item JMeter
+  \href{http://jakarta.apache.org/jmeter}{jakarta.apache.org/jmeter}
+\item Stress testing an application with JMeter (Daniel Rubio, Feb 2004)\\
+  \href{http://www.newsforge.com/software/04/02/19/1452218.shtml}
+            {www.newsforge.com/software/04/02/19/1452218.shtml}
+\item JMeter-Ant-Task: \href{http://www.programmerplanet.org/ant-jmeter/}
+     {www.programmerplanet.org/ant-jmeter/}
+%%\item CruiseControl: Automatisiertes Testen und Erstellen:
+\href{http://cruisecontrol.sourceforge.net}{cruisecontrol.sourceforge.net}
+
+\item Hudson: Extensible continous integration server:
+\href{http://jenkins-ci.org}{jenkins-ci.org}
+%
+\item Java Extreme Programming Cookbook (Eric M. Burke, Brian M. Coyner):
+
+  \href{http://www.oreilly.com/catalog/jextprockbk}
+      {www.oreilly.com/catalog/jextprockbk}
+%
+\item Findbugs:
+  \href{http://findbugs.sourceforge.net}{findbugs.sourceforge.net}
+\item PMD:
+  \href{http://pmd.sourceforge.net/}{pmd.sourceforge.net/}
+\item Fit: \href{http://fit.c2.com}{fit.c2.com}
+\item FitNesse: \href{http://fitnesse.org}{fitnesse.org}
+\item Programming Tools: FitNesse (Reg. Charney)
+
+\href{http://www.linuxjournal.com/article/8482}
+    {www.linuxjournal.com/article/8482}
+\item Wiki-getriebene Akzeptanztests (Josef Adersberger):
+
+\href{http://javamagazin.de/itr/online_artikel/psecom,id,787,nodeid,11.html}
+     {javamagazin.de/itr/online\_artikel/psecom,id,787,nodeid,11.html}
+
+%\item Ein Eclipse-Plugin für Fit:
+%
+%\href{http://fitrunner.sourceforge.net}{fitrunner.sourceforge.net}
+
+\item Web-Testing mit Selenium:
+
+\href{http://www.openqa.org/selenium}{www.openqa.org/selenium}
+%
+\item Web-Testing mit Canoo:
+
+\href{http://webtest.canoo.com/webtest/manual/WebTestHome.html}
+{webtest.canoo.com/webtest/manual/WebTestHome.html}
+
+\item Data-Driven Tests:
+  \href{http://www.ddsteps.org}{www.ddsteps.org}
+\item EasyB \href{http://www.easyb.org}{www.easyb.org}
+\item Concordion \href{http://www.concordion.org}{www.concordion.org}
+\item JBehave \href{http://jbehave.org/}{jbehave.org/}
+\item RobotFramework \href{http://code.google.com/p/robotframework}{code.google.com/p/robotframework}
+\end{itemize}
+% code checking tools:
+% http://www.tiobe.com/
+%
+% http://jcsc.sourceforge.net/
+% JTest http://www.parasoft.com/jsp/products/home.jsp?product=Jtest&itemId=11
+% JStyle ?
+%
+% http://en.wikipedia.org/wiki/GUI_testing
+%
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "cvs-aufgaben"
+%%% End:

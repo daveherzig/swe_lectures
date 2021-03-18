@@ -1,0 +1,183 @@
+% -----------------------------------------------------------------------
+\chapter{Object Oriented Programming}
+%-----------------------------------------------------------------------
+\section{Introduction}
+Object-oriented programming is a programming paradigm based on the
+concept of \emph{objects}, which can contain data, in the form of
+fields (attributes or properties), and code, in the form of procedures
+(methods).\\
+The key concepts in OOP are:
+\begin{itemize}
+\item Abstraction (objects, classes)
+\item Data Encapsulation
+\item Inheritance
+\item Polymorphism
+\end{itemize}
+The following chapter will give a brief overview of the key concepts
+in object oriented programming. This is of course not a course about
+object oriented programming. But it makes perfectly sense to understand
+the key concepts as they are also used in several areas of software
+engineering.
+
+\section{Languages}
+There are many object oriented programming languages available.
+Each language has its advantages and disadvantages. The most popular
+languages are:
+\begin{itemize}
+\item C++
+\item Java
+\item .Net
+\item Python
+\item ...and many more!
+\end{itemize}
+
+\section{Abstraction}
+Abstraction means using simple things to represent complexity.
+We all know how to turn the TV on, but we do not need to know how
+it works in order to enjoy it. In OOP, abstraction means simple
+things like objects, classes, and variables represent more complex
+underlying code and data. This is important because it lets avoid
+repeating the same work multiple times.
+
+\begin{lstlisting}
+public class TV {
+  private Color color;
+  private int size;
+  public void turnOn(){ // some complex code }
+  public void turnOff(){ // some complex code }
+  public void changeChannel(){ // some complex code }
+}
+
+TV tv1 = new TV();
+TV tv2 = new TV();
+\end{lstlisting}
+TV is the class definition. \verb|tv1| and \verb|tv2| are the
+objects. They both have their own color and size.
+
+\section{Data Encapsulation}
+This is the practice of keeping fields within a class private,
+then providing access to them via public methods. It's a protective
+barrier that keeps the data and code safe within the class itself.
+This way, we can re-use objects like code components or variables
+without allowing open access to the data system-wide.
+
+\begin{lstlisting}
+public class Circle {
+  private double radius;
+  public void setRadius(double radius) {this.radius = radius;}
+  public void getRadius() {return radius;}
+}
+
+Circle circle = new Circle();
+circle.setRadius(10); // correct way
+circle.radius = 10; // compilation error, radius is private
+\end{lstlisting}
+
+\section{Inheritance}
+This is a special feature of Object Oriented Programming.
+It lets programmers create new classes that share some of the
+attributes of existing classes. This lets us build on previous work
+without reinventing the wheel.
+
+\begin{lstlisting}
+public class Doctor {
+  protected String name;
+  public void doctorDetails() { // do some stuff }
+}
+
+public class Surgeon extends Doctor {
+  public void surgeonDetails() { // do some stuff }
+}
+
+Surgeon jamesMiller = new Surgeon();
+jamesMiller.surgeonDetails();
+jamesMiller.doctorDetails();
+\end{lstlisting}
+
+The object \verb|jamesMiller| is a doctor and a surgeon.
+
+\section{Polymorphism}
+This OOP concept lets programmers use the same word to mean
+different things in different contexts. One form of polymorphism
+is method overloading. That's when different meanings are implied
+by the code itself. The other form is method overriding. That's when
+the different meanings are implied by the values of the supplied
+variables.
+
+\begin{lstlisting}
+public abstract class DBConnection {
+  public abstract void connect();
+};
+
+public class OracleConnection extends DBConnection {
+  public void connect() { // connect to oracle db }
+};
+
+public class SQLServerConnection extends DBConnection {
+  public void connect() { // connect to sql server db }
+};
+
+DBConnection connection1 = new OracleConnection();
+DBConnection connection2 = new SQLServerConnection();
+connection1.connect();
+connection2.connect();
+\end{lstlisting}
+
+Both objects, \verb|connection1| and \verb|connection2| are of
+type \verb|DBConnection|. During runtime, the \verb|connection1| object
+will point to a \verb|OracleConnection| object, the
+\verb|connection2| object will point to a \verb|SQLServerConnection| object.
+When calling the \verb|connect| method o both objects, a different method
+will be called.
+
+\section{Exercises}
+\begin{enumerate}
+\item Write a class called \verb|Util|. This class should contain a method
+\verb|createSampleDNA| which will create a sample DNA sequence of
+a given length.\\
+The program should be callable from the command line. One parameter
+could be provided, which specifies the length of the sequence. If
+no parameter is provided, the default length is 100.
+\item Extend your \verb|Util| class with a method which counts the
+number of A, G, C and T in a given sequence. The sequence will also
+be provided as parameter.
+\item Implement the data loader component. Create a project in your
+preferred development environment and create on class \verb|Loader|.
+This class should fulfill the following steps:
+\begin{itemize}
+\item The program should be called with a properties file as parameter.
+This file will contain information like db location, username and password.
+\item The program will read the data file line by line
+\item The program will insert the data into the database
+\item Please ensure that the program is running with an acceptable performance and resource consumption
+\end{itemize}
+\item If the data is loaded, please try to answer the following questions by
+using SQL statements:
+\begin{itemize}
+\item How many gene information entries are available?
+\item How many genes have the type \emph{protein-coding}?
+\item How many genes have the type \emph{protein-coding} and are
+related to the specie \emph{Human}?
+\end{itemize}
+\end{enumerate}
+
+\subsection{SQL Help}
+\begin{lstlisting}
+drop database if exists XZY;
+
+create database XYZ;
+
+use XZY;
+
+create table TTT (
+  column1 varchar(256),
+  column2 int,
+  ...,
+  PRIMARY KEY(column1),
+  FOREIGN KEY(column2) REFERENCES TABLE_X(column_x)
+);
+
+CREATE USER 'dataloader'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES on XZY.* TO 'dataloader'@'localhost';
+FLUSH PRIVILEGES;
+\end{lstlisting}

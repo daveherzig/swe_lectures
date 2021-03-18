@@ -1,0 +1,50 @@
+\subsubsection{HtmlUnit}
+HtmlUnit wird als ``Browser für Java-Programme'' bezeichnet.
+HtmlUnit basiert auf Junit. Das heisst, man geht grundsätzlich wie gewohnt vor:
+Man erstellt eine Testklasse und fügt
+ dieser Klasse
+ sukzessive die entsprechenden Testmethoden hinzu. 
+
+\newslide
+Am einfachsten verwendet man 
+HtmlUnit mit Maven und ergänzt das POM-File mit folgendem Element:
+\begin{lstlisting}[language=xml,
+   morekeywords={dependency,groupId,artifactId,version,scope}]
+<dependency>
+  <groupId>net.sourceforge.htmlunit</groupId>
+  <artifactId>htmlunit</artifactId>
+  <version>2.4</version>
+</dependency>
+\end{lstlisting}
+Dazu muss die Junit-Version auf den Wert 4.4 gesetzt werden.
+\newslide
+Als Testfall 
+wird man in der Regel eine Server-Verbindung kreieren und überprüfen, ob die
+erwarteten Ergebnisse zurückgegeben werden:
+\begin{lstlisting}[language=java]
+public class SimpleWebTest {
+  @Test
+  public void homePage() throws Exception {
+    final WebClient webClient = new WebClient();
+    final HtmlPage page = (HtmlPage)webClient.
+                 getPage("http://localhost:8080/hitchhikers-guide");
+    assertEquals("Welcome", page.getTitleText());
+  }
+\end{lstlisting}
+\newslide
+Das folgende Beispiel zeigt, dass auch Web-Formulare getestet werden können:
+\begin{lstlisting}[language=java]
+  @Test
+  public void submitForm() throws Exception {
+    final WebClient webClient = new WebClient();
+    final HtmlPage page1 = (HtmlPage)webClient.
+                 getPage("http://localhost:8080/hello/login");
+    final HtmlForm page1.getFormByName("loginform");
+    final HtmlTextInput textfield = form.getInputByName("username");
+    final HtmlSubmitInput button = form.getInputByName("submit");
+
+    textfield.setValueAttribute("douglas");
+    final HtmlPage page2=(HtmlPage)button.click();
+    assertEquals( "Main", page.getTitleText() );
+  }
+\end{lstlisting}

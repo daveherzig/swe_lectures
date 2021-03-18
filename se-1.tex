@@ -1,0 +1,133 @@
+\documentclass[11pt, paper=a4, DIV=16, BCOR=0mm, autooneside=yes]{scrbook}
+%
+\input{config/packages}
+%
+\pagestyle{scrheadings}
+\clearscrheadfoot
+\ihead{\headmark}
+\ohead{Page \pagemark\ / \pageref{LastPage}}
+\ifoot{FHNW LST\\R. Tanner, D. Herzig}
+\ofoot{Software Engineering I}
+%
+\newcolumntype{A}{%
+  >{\color{black}\columncolor[gray]{0.8}[0.9\tabcolsep]}
+}
+\newsavebox{\rk}
+\sbox{\rk}{\framebox[3mm]{\rule{0mm}{2mm}}}\vspace{1cm}
+\newif\ifslides
+\slidesfalse % We are not producing slides here
+\newcommand{\newslide}{}
+%
+\definecolor{SteelBlue}     {rgb}{0.27,0.51,0.71}
+\newcommand{\structure}[1]{\textcolor{SteelBlue}{\bfseries #1}}
+%
+\usepackage{pifont}
+\newcommand{\OK}{\ding{52}}
+%
+\newcounter{saveenum}
+%
+  \hypersetup{%
+    pdftitle      = {Medical Software Engineering},
+    pdfsubject    = {Lecture Notes FHNW/Life Science Technologies 2020},
+    pdfkeywords   = {},
+    pdfauthor     = {Ronald Tanner, David Herzig},
+    pdfcreator    = {\LaTeX\ with package \flqq hyperref\frqq},
+  }
+  %
+\newenvironment{boxedminipage}
+  {\begin{Sbox}\begin{minipage}}%
+  {\end{minipage}\end{Sbox}\shadowbox{\TheSbox}}
+  %
+\definecolor{darkgreen}{rgb}{0.0,0.7,0.0}
+\definecolor{lightblue}{rgb}{0.4,0.4,0.9}
+\definecolor{lightblue2}{rgb}{0.95,0.95,1}
+
+\newcommand{\bluebg}[0]{
+  \rowcolor{lightblue}%[6pt][10pt]
+}
+
+\newcommand{\greenbg}[0]{
+  \rowcolor{darkgreen}%[6pt][5pt]
+}
+
+\newcommand{\orangebg}[0]{
+  \rowcolor{orange}%[6pt][1pt]
+}
+%
+\definecolor{lbcolor}{rgb}{0.92,0.92,0.92}
+\definecolor{cmtcolor}{rgb}{0.0,0.5,0.0}
+\lstset{numbers=left,
+        numberstyle=\tiny,
+        keywordstyle=\color{blue}\bfseries\sffamily,
+        identifierstyle=\ttfamily,
+        commentstyle=\em,
+        stringstyle=\ttfamily,
+        extendedchars=true,
+        showstringspaces=false,
+        language=c++,
+        backgroundcolor=\color{lbcolor},
+        commentstyle=\color{cmtcolor}}
+%
+\newbox{\fhnwhead}
+\sbox{\fhnwhead}{
+%\parbox[b]{60mm}{
+  \includegraphics{FHNWLOGO}
+%\raggedright\sf\footnotesize
+%    Fachhochschule beider Basel\\
+%    Nordwestschweiz}
+}
+\newbox{\lsthead}
+\sbox{\lsthead}{\parbox[b]{60mm}{\raggedleft\sffamily\footnotesize
+Hochschule Life Sciences\\
+{\bfseries Life Science Technologies}\\
+}}
+%
+\graphicspath{{images/}}
+%
+\begin{document}
+\input{titlepage-1}
+%\newpage
+%--------------------------------------------------------------------------
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+%--------------------------------------------------------------------------
+\input{uebersicht}
+\clearpage
+\input{content/course_req}
+\input{content/software-engineering}
+%\input{content/course-project-rasperrypi}
+\input{content/course-project-geneinformationservice}
+\input{content/project-planning}
+\input{content/lifecycle}
+\input{content/requirements}
+\input{content/oop}
+\input{content/system-analysis}
+\input{content/design-patterns}
+\input{content/config-management}
+\input{content/versioncontrol}
+\input{content/buildprocess}
+\input{content/bugtracking}
+\input{content/testen}
+\input{content/testingtools}
+\input{content/quality-management}
+\appendix
+%\input{content/uml-examples}
+%
+%
+%\include{testen}
+%
+%
+%\include{jdbc}
+%\include{hibernate}
+%\include{spring}
+%\begin{appendix}
+%\section{Literatur}
+%\include{code-of-ethics}
+%\end{appendix}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
