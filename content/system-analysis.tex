@@ -212,9 +212,9 @@ There are 3 different types of visibility for attributes and methods:
 \paragraph{Inheritance} (generalization)\\[2ex]
 \begin{minipage}[c]{0.5\linewidth}
 \ifslides
-\includegraphics[width=\linewidth]{uml/img/Vererbung}
+\includegraphics[width=\linewidth]{uml/img/bell_fig5.jpg}
 \else
-\includegraphics[width=\linewidth]{uml/img/Vererbung}
+\includegraphics[width=\linewidth]{uml/img/bell_fig5.jpg}
 \fi
 \end{minipage}
 \begin{minipage}[c]{0.45\linewidth}
@@ -288,159 +288,56 @@ between two entities, the composed object cannot exist without the other entity.
 \begin{minipage}[c]{0.69\linewidth}
 Comments could be added for additional clarification or description.
 \end{minipage}
-%
-\newpage
-\ifslides
-\paragraph{Beispiel}\ \\
-\includegraphics[width=0.9\linewidth]{uml/img/Beobachter}
-\else
-\paragraph{Beispiel}
-Ein Objekt soll in der Lage sein, andere Objekte zu benachrichtigen,
-ohne Annahmen dar\"uber zu treffen, wer die anderen Objekte sind.
-Mit anderen Worten: gesucht ist eine Struktur mit
- möglichst lose gekoppelten Objekten.
-Die L\"osung dieses Problems ist unter dem Begriff
-Beobachter (Observer) bekannt.
-%
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=\linewidth]{uml/img/Beobachter}
-\caption{Entwurfsmuster Beobachter}
-\end{center}
-\end{figure}
-\fi
-%
-%\begin{center}
-%\ifslides
-%\includegraphics[width=0.4\linewidth]{uml/xfig/uml-classdiagram}
-%\else
-%\includegraphics[width=0.7\linewidth]{uml/xfig/uml-classdiagram}
-%\fi
-%\end{center}
-\ifslides
-\newpage
-\fi
-\underline{Vorgehen}
-\begin{enumerate}
-\item Klassen und Beziehungen identifizieren,
-\item die relevanten Attribute und Methoden hinzuf\"ugen,
-\item generalisieren durch Vererbung,
-\item die Klassen in Kategorien (Module) gruppieren
-\end{enumerate}
+
 %--------------------------------------------------------------------------
 \newpage
 \subsection{The Creation of Class Diagrams}
-\underline{1. Schritt: Identifizieren von Klassen und deren Beziehungen}\\[2ex]
-Ausgangspunkt ist den meisten F\"allen eine verbale Beschreibung des
-Problembereichs im Vokabular des Anwenders. Eine g\"angige, wenn
-auch zum Teil kritisierte, Methode
-zur Identifizierung der Klassen (und Objekte) basiert auf einer Textanalyse,
-bei der die Substantive als m\"ogliche Kandidaten dienen:\\[2ex]
-\begin{tabularx}{\linewidth}{l|X}
-Personen, Rollen & Lieferant, Kunde, Mitarbeiter, Student, Dozent \\
-Dinge, Ger\"ate  & Beh\"alter, Tank, Regler, Pumpe, Zeitgeber, Schalter,
-            Messger\"at, Sensor, Filter, Anzeige\\
-Abstraktionen & Stack, Array, Tabelle, Sequenz, Menge, Figur, Dreieck, Linie,
-    Datei, Baustein, Element\\
-%%\item[Orte]
-Beschreibungen, Dokumente & Rezeptur, Produkt, Konto\\
-Ereignisse, Vorg\"ange & Prozess, Simulation, Steuerung, Nachricht\\
-Interaktionen& Bestellung, Kaufvertrag, Buchung, Reservation,
-Anmeldung, Auftrag
-%%\item[Externe Systeme]
-%%\item[Organisationseinheiten]
-\end{tabularx}
+The start to design a class diagram is in most cases a verbal description
+of the problem. Classes will be defined by analyzing that problem
+description.
 
-In der Regel findet man in einer ersten Analyse des Problembereichs
-mehr Klassen, als man wirklich ben\"otigt. Auf weiter zu verwendende Klassen
-m\"ussen die folgenden Aussagen zutreffen:
 \begin{enumerate}
-\item Ihr Name ist eindeutig, d.h. kein Synonym einer bereits
- ausgew\"ahlten Klasse.
-\item Sie enth\"alt Informationen (Attribute), die innerhalb
-  des Systems gespeichert werden sollen.
-\item Sie stellt system-relevante Operationen zur Verf\"ugung (mehr als
-   nur Setzen und Abfragen).
+\item \emph{Step 1: Identify class names}\\
+The first step is to identify the primary objects of the system.
+
+\item \emph{Step 2: Add relevant attributes and methods}\\
+Fill each class with attributes and methods.
+
+\item \emph{Step 3: Add relations}\\
+Next step is to determine how each of the classes or objects are
+related to one another. Look out for commonalities and abstractions
+among them; this will help you when grouping them when drawing the
+class diagram. Relations are:
+\begin{itemize}
+\item Association
+\item Inheritance
+\item Aggregation
+\item Composition
+\item Dependency
+\item Realization/Implementation
+\end{itemize}
+
 \end{enumerate}
-Beziehungen zwischen den Objekten entsprechen physischen oder
-logischen Verkn\"upfungen mit zugeh\"origen Kardinalit\"aten
-analog den Relationen zwischen Entit\"aten:
+
+\subsubsection{Best Practices}
+
 \begin{itemize}
-\item Assoziation: semantische Verkn\"upfung
-\item Aggregation: ``hat-ein''-Verkn\"upfung
-\item Verwendung: Nutzungs-Verkn\"upfung
-\item Vererbung: ``ist-ein''-Verkn\"upfung
+\item Class diagrams may tend to get incoherent as they expand and grow.
+It’s best to avoid creating large diagrams and breaking them down into
+smaller ones that you can link to each other later. You can very easily do
+this by using a tool (e.g. StarUML, Umbrello, ArgoUML). It helps you improve
+the readability of your diagrams.
+\item Using the simple class notation, you can quickly create a high-level
+overview of your system. A detailed diagram can be created separately as
+required, and even linked to the first one for easy reference.
+\item The more lines overlap on your class diagrams, the more cluttered
+it becomes. The reader will only get confused trying to find the path.
+Make sure that no two lines cross each other.
+\item Use colors to group common modules. Different colors on different
+classes help the reader differentiate between the various groups.
 \end{itemize}
+
 \newpage
-%--------------------------------------------------------------------------
-%{\bfseries Beispiel:} Es soll ein einfaches
-%Zeichnungsprogramm entwickelt werden, mit welchem der Anwender
-%verschiedene Figuren (Linien, Rechtecke) mit dem Mauszeiger
-%erzeugen und in einer
-%Zeichenfl\"ache darstellen kann.
-%Eine Reihe in senkrechter Kolonne angeordneter und
-%gegenseitig sich ausschliessender
-%Kontrollkn\"opfe, die sich am rechten (oder linken) Rand der
-%Zeichenfl\"ache befindet, erlaubt die Auswahl des zu zeichnenden Figurentyps.
-%Mit einer weiteren solchen Reihe kann die Farbe gew\"ahlt werden.
-%Schliesslich gibt es noch Druckkn\"opfe zum L\"oschen oder Verlassen des
-%Programms.
-%\newpage
-%--------------------------------------------------------------------------
-%\subsection*{Objektorientierte Analyse (Object-Oriented Analysis)}
-{\bfseries Beispiel:} Klassendiagramm eines bekannten Spiels:\\[1.5ex]
-%%
-\begin{center}
-\ifslides
-\includegraphics[width=0.77\linewidth]{uml/img/monopoly}
-\else
-\includegraphics[width=0.9\linewidth]{uml/img/monopoly}
-\fi
-\end{center}
-\ifslides
-\else
-{\footnotesize Source: Craig Larman}\\[2ex]
-\fi
-%--------------------------------------------------------------------------
-%\subsection*{Klassendiagramm}
-\underline{2. Schritt: Hinzuf\"ugen der relevanten Attribute und Methoden}
-\begin{itemize}
-\item Attribute sind die Eigenschaften der Objekte:
-\begin{enumerate}
-\item Wie wird das Objekt allgemein beschrieben?
-\item Wie wird das Objekt im Problembereich beschrieben?
-\item Können zusammengehörende Attribute zu einer Gruppe
-  zusammengefasst werden?
- (Bsp: Vorname, Nachname, Anrede ergibt Name)
-\end{enumerate}
-\item Methoden sind die Dienste, die ein Objekt bereitstellt:
-\begin{enumerate}
-\item Berechnungen
-\item \"Uberwachung
-\item Kommunikation
-\end{enumerate}
-aus Gründen der \"Ubersichtlichkeit sollen nur explizite und
-keine impliziten Methoden im Objektmodell dargestellt werden.
-Implizite Methoden sind: Konstruktorfunktionen, Zugriffsfunktionen zu den
-  Attributen, Verbindungsfunktionen zum Setzen und L\"osen von Verbindungen.
-\end{itemize}
-\newpage
-\underline{3. Schritt: Generalisieren durch Vererbung}\\[2ex]
-Durch eine Vererbungsstruktur werden Klassen
-die
-\begin{itemize}
-\item Spezialfälle einer andern Klasse sind oder
-\item gemeinsame Attribute mit andern Klassen haben
-\end{itemize}
-in einer gemeinsamen Basisklasse zusammengefasst.\\[3ex]
-\underline{4. Schritt: Gruppierung der Klassen in Kategorien}
-\begin{itemize}
-\item Jede Klasse ist Teil genau einer Kategorie.
-\item Die Kopplung zwischen Klassen unterschiedlicher Kategorien ist minimal.
-\end{itemize}
-\ifslides
-\newpage
-\fi
 %--------------------------------------------------------------------------
 \section{Interaction Diagrams}
 An \structure{interaction diagram} visualizes the interactions between

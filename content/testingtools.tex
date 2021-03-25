@@ -3,7 +3,7 @@
 % Jupiter
 % Mylyn
 %
-\section{Test-Werkzeuge}
+\chapter{Testing Tools}
 \begin{tabularx}{\linewidth}{l|X}
  Unit-Test-Framework & vereinfacht die Erstellung und Durchführung von
  Unit-Tests\\
@@ -29,7 +29,7 @@ Programmkode-Analysen & \"Uberwachung der Komplexität
  Management und Dokumentation & Test-Planung und -dokumentation \\
 \end{tabularx}
 \newpage
-\subsection{Statische Code-Analyse}
+\section{Statische Code-Analyse}
 Statische Code-Analyse-Werkzeuge analysieren den
  Source-, resp. Byte-Code nach bestimmten Regeln
 ohne ihn auszuführen.
@@ -57,7 +57,7 @@ Beispiel Findbugs:
 \fi
 %
 \newslide
-\subsubsection{Checkstyle}
+\subsection{Checkstyle}
 Mit Checkstyle kann die Einhaltung von Programmier-Richtlinien (Code
 Conventions) überprüft werden. Nach Bedarf kann Checkstyle an spezifische
 Anforderungen angepasst werden. Als Vorlage kann dazu die mitgelieferte
@@ -114,7 +114,7 @@ Beispiel:
 \end{figure}
 %
 \newslide
-\subsection{Assertions}
+\section{Assertions}
 Mit der Anweisung \verb+assert+ können
 bestimmte Bedingungen und Zustände überprüft werden:
 \begin{lstlisting}[language=java, morekeywords={assert}]
@@ -153,7 +153,7 @@ Programmfehlern verwendet werden. Sie bilden so ein nützliches Hilfsmittel für
 die Fehlersuche.
 %
 \newslide
-\subsection{Logging und Tracing}
+\section{Logging und Tracing}
 Unter Logging und Tracing versteht man die Aufzeichnung von
 Ereignissen und Daten während der Ausführung eines Programmes.
 Entwicklern und Betreibern dienen diese Informationen zur
@@ -193,7 +193,7 @@ Für das Logging von Exceptions empfiehlt sich folgendes Muster:
 			// show stack strace in log output
    }
 \end{lstlisting}
-\subsubsection{Konfiguration}
+\subsection{Konfiguration}
 Die Anzeige der Meldungen, ihr Format und wohin diese letztendlich
 geschrieben (File, Console, Mail, Datenbank ..) werden sollen, kann zur
 Laufzeit festgelegt werden. Die entsprechenden
@@ -291,7 +291,7 @@ Ausgabeformates verwendet werden:
 \%M & Java method name\\
 \end{tabularx}
 %
-\subsubsection{Logging versus Debugging}
+\subsection{Logging versus Debugging}
 Brian W. Kernighan, Rob Pike, ``The Practice of Programming'' (1999):
 \begin{quote}
 As a personal choice, we tend not to use debuggers beyond getting a stack trace
@@ -307,7 +307,7 @@ transient.
 \end{quote}
 %
 \newslide
-\subsubsection{Alternativen zu Log4j}
+\subsection{Alternativen zu Log4j}
 Es mehrere Alternativen zu Log4j. Zum Beispiel:
 \begin{itemize}
 \item \structure{java.util.logger}:
@@ -437,7 +437,7 @@ zahlreiche Erweiterungen (es existiert sogar eine Grovvy-Variante):
 \end{itemize}
 %
 \newslide
-\subsection{Vergleiche von Textdateien}
+\section{Vergleiche von Textdateien}
 Vergleiche von Textdateien sind oft nicht einfach, wenn man dazu
 nicht einen spezialisierten Texteditor (z.B Emacs, what else?) verwenden will.
 Unter den Unix-Werkzeugen gibt es jedoch zwei Programme, die
@@ -539,7 +539,7 @@ Quelle:
 \href{http://www.brunolinux.com/02-The_Terminal/Diff_and_Cmp.html}
 {www.brunolinux.com/02-The\_Terminal/Diff\_and\_Cmp.html}
 \newslide
-\subsection{Integritätsprüfung mit Md5sum}
+\section{Integritätsprüfung mit Md5sum}
 Die MD5-Summen (RFC 1321)
 aller in im aktuellen Verzeichnis und darunter
 liegenden Dateien können auf einem Unix-System mit folgender Anweisung
@@ -569,8 +569,8 @@ Quelle: \href{http://www.brunolinux.com/02-The_Terminal/Diff_Find_and_Md5sum.htm
   {www.brunolinux.com/02-The\_Terminal/Diff\_Find\_and\_Md5sum.html}
 %
 \newslide
-\subsection{Unit-Test}
-\subsubsection{JUnit}
+\section{Unit-Test}
+\subsection{JUnit}
 JUnit ist ein einfaches und mächtiges Java-Framework für die
 Entwicklung und das Ausführen von Unit-Tests.
 %Mit Hilfe von Klassenbibliotheken wie
@@ -711,7 +711,7 @@ von Alberto Savoia halten:
 \end{itemize}
 %
 \newslide
-\subsubsection{Junit4}
+\subsection{Junit4}
 Die aktuelle Verion 4 von Junit bietet gegenüber der Version 3.8
 die folgenden Verbesserungen:
 \begin{itemize}
@@ -764,7 +764,7 @@ public class SimpleTest {
 %Ein Nachteil von Junit4 ist die noch fehlende Unterstützung in Ant.
 %
 \newslide
-\subsubsection{TestNG}
+\subsection{TestNG}
 In eine ähnliche Richtung wie Junit4 geht auch TestNG. TestNG
  bietet jedoch noch einige zusätzliche Möglichkeiten:
 \begin{itemize}
@@ -804,7 +804,7 @@ public class SimpleTest {
 }
 \end{lstlisting}
 \newslide
-\subsubsection{Mock-Objekte}
+\subsection{Mock-Objekte}
 Beim Unit-Testen ist man darauf angewiesen, dass die Methoden der zu testenden
 Klasse weitgehend von der Umgebung isoliert ausgeführt werden
 können. Leider kann diese Voraussetzung in den meisten Fällen nicht
@@ -1087,7 +1087,7 @@ der RFIDReader-Klasse hinzugefügt:
 Sie gibt einen String-Array mit den gelesenen RFID-Tags zurück.
 %-------------------------------------------------------------------------
 \newslide
-\subsubsection{DBUnit}
+\subsection{DBUnit}
 Die grundsätzliche Problematik beim Testen von Datenbank-Code
 beschreibt Richard Dallaway sehr anschaulich:
 \href{http://www.dallaway.com/acad/dbunit.html}
@@ -1233,7 +1233,7 @@ auch ganze Tabellen können mit DBunit einfach geprüft werden:
     }
 \end{lstlisting}
 %\newslide
-%\subsubsection{XML Unit-Test}
+%\subsection{XML Unit-Test}
 %Da XML-Dokumente ganz offensichtlich nicht wie
 %andere Textdateien durch einen zeilenweisen Vergleich
 %geprüft werden können ..
@@ -1242,7 +1242,7 @@ auch ganze Tabellen können mit DBunit einfach geprüft werden:
 % http://www.ibm.com/developerworks/java/library/j-cq121906.html
 %
 %\newpage
-\subsubsection{Testbericht-Generierung mit Ant und Maven}
+\subsection{Testbericht-Generierung mit Ant und Maven}
 Sowohl Ant wie auch Maven eignen sich für die automatisierte
 Testdurchführung und Generierung der Testreports.
 
@@ -1356,7 +1356,7 @@ dafür gesorgt werden, dass im
 Parent-Modul die Resports aller Child-Module zusammengeführt werden.
 %
 \newslide
-\subsubsection{Messung des Abdeckungsgrades}
+\subsection{Messung des Abdeckungsgrades}
 Mit Code-Coverage-Analysen können ungetestete Code-Stellen identifiziert
 werden. Dadurch lassen sich gezielt zusätzliche Unit-Tests entwickeln.
 
@@ -1443,7 +1443,7 @@ Mit Maven ist es auch hier wesentlich einfacher:
 \fi
 %-------------------------------------------------------------------------
 \newpage
-\subsection{Continuous Integration}
+\section{Continuous Integration}
 Mit dem Begriff ``Continuous Integration'' (abgekürzt CI) bezeichnet man das
 automatisierte, regelmässige und häufige Erstellen eines Softwaresystems während
 dessen Entwicklung. Damit kann auf einfachste Weise sichergestellt
@@ -1484,7 +1484,7 @@ Bekannte Vertreter von CI-Server-Systemen sind:
 \end{itemize}
 %
 \newslide
-\subsubsection{CruiseControl}
+\subsection{CruiseControl}
 CruiseControl ist ein von ThoughtWorks in Java entwickelter
 CI-Server.
 CruiseControl kann mittels einer XML-Datei konfiguriert werden:
@@ -1568,7 +1568,7 @@ korrekte Installationsverzeichnis zeigt, und dass beim
 Maven-Buildprozess auch wirklich eine Installation durchgeführt wird.
 %
 % http://www.javaworld.com/javaworld/jw-12-2008/jw-12-hudson-ci.html
-\subsubsection{Jenkins}
+\subsection{Jenkins}
 Jenkins wurde ursprünglich bei Sun Microsystems von Kohsuke Kawaguchi
 auf Open-Source-Basis unter dem Namen Hudson entwickelt. Nach der
 Übernahme von Oracle hat Kawaguchi das Unternehmen verlassen und das
@@ -1614,7 +1614,7 @@ geschehen:
 % John Ferguson Smart
 %\href{http://www.wakaleo.com/public_resources/continuous-integration-with-hudson.pdf}
 %\newslide
-%\subsubsection{Aufgabe}
+%\subsection{Aufgabe}
 %Ein Maven-basiertes Projekt soll von einem CI-Server überwacht
 %werden.
 %Nehmen Sie ein geeignetes System in Betrieb und sorgen Sie dafür,
@@ -1626,7 +1626,7 @@ geschehen:
 %
 %\newpage
 \newslide
-\subsection{Speichertests mit Valgrind}
+\section{Speichertests mit Valgrind}
 Valgrind ist ein Open-Source-Tool für das Auffinden von
 Speicher-Managementproblemen in Linux-x86-Programmen:
 \begin{itemize}
@@ -1671,7 +1671,7 @@ Die Zahl zwischen den beiden Gleichheitszeichen bezeichnet die Prozessnummer.
 \fi
 %
 \newpage
-\subsection{GUI-Tests mit Abbot und FEST}
+\section{GUI-Tests mit Abbot und FEST}
 Das Testen von grafischen Benutzeroberflächen
 ist meist eine heikle Angelegenheit. Hauptsächlich hat dies
 damit zu tun, dass bereits kleine Layout-Änderungen bei
@@ -1803,7 +1803,7 @@ public class FestSearchTest extends TestCase {
 }
 \end{lstlisting}
 %
-%\subsubsection{Aufgabe}
+%\subsection{Aufgabe}
 %Führen Sie die notwendigen Anpassungen durch,
 %so dass mit der Klasse FestSearchTest getestet
 %werden kann, ob die Tabelle resultTable des Search-Dialogfensters
@@ -1815,7 +1815,7 @@ TODO: Include WEBTEST
 \newpage
 \input{content/webtest}
 %
-\subsection{Belastungstests mit JMeter}
+\section{Belastungstests mit JMeter}
 Mit JMeter, einem Java-basierten, Open-Source Tool aus dem
 Apache/Jakarta-Projekt,  ist es möglich das Lastverhalten von
 Client-Server-Applikationen zu testen.
@@ -1886,7 +1886,7 @@ Mit einem Listener-Element können die gesammelten Daten sichtbar gemacht und
 in ein File abgespeichert werden.
 %
 \newpage
-\subsection{Profiling}
+\section{Profiling}
 Zur Verbesserung und Optimierung der Laufzeiteigenschaften ist es nützlich, die
 Verteilung der CPU-Nutzung auf die einzelnen Programmteile ermitteln zu
 können. Hierzu gibt es verschiedene, meist kommerzielle Werkzeuge. Für einfache
@@ -1999,7 +1999,7 @@ Statt 291 Samples gibt es jetzt nur noch 29 Samples. Das Programm ist demnach
 10 mal schneller geworden.
 %
 \newpage
-\subsection{Abnahmetests (Acceptance Testing)}
+\section{Abnahmetests (Acceptance Testing)}
 Der Nachweis, dass die
 Benutzeranforderungen erfüllt sind, wird durch
 das ``Acceptance Testing'' erbracht.
@@ -2036,7 +2036,7 @@ Sprache, einer sogenannten DSL (Domain-Specific Language), beschrieben:
 \structure{Then} ensure some outcomes.
 \newslide
 %
-\subsubsection{Fit}
+\subsection{Fit}
 Fit ist ein Open-Source-Tool für Abnahme- und Systemtests, das
 darauf ausgerichtet ist, dass die Tests von Benutzern ohne tiefgehende
 Informatikkenntnisse definiert werden können.
@@ -2204,7 +2204,7 @@ Nebst diesen in der Fit-Library enthaltenen können auch eigene Fixture-Klassen
 geschrieben werden.
 %
 \newslide
-%\subsubsection{Integrationstests mit Maven}
+%\subsection{Integrationstests mit Maven}
 
 Mit Hilfe des Plugins fit-maven-plugin können in der Phase
 integration-test Akzeptanztests auf der Basis von Fit durchgeführt werden.
@@ -2226,7 +2226,7 @@ abgelegten HTML-Dateien als Eingabe-Argument
  dem Programm fit.FileRunner übergeben. Die Ergebnisdateien werden
  anschliessend ins Verzeichnis target/fit geschrieben.
 \newslide
-\subsubsection{FitNesse}
+\subsection{FitNesse}
 FitNesse ist ein auf Fit basierendes WIKI-System zur Spezifikation von
 Anforderungen und Testfällen.
 \begin{figure}[H]
@@ -2266,7 +2266,7 @@ hinzugefügt und der Test kann ausgeführt werden, sofern die benötigten
 Fixture-Klassen implementiert sind.
 %
 \newslide
-\subsubsection{JBehave}
+\subsection{JBehave}
 JBehave wurde von Dan North entwickelt, weil er zeigen wollte, wie man
 Testspezifikationen lesbarer und übersichtlicher machen kann.
 
@@ -2327,7 +2327,7 @@ public class MusicLibraryScenarios extends JUnitStory {
 \item Man führt die Tests mit dem Junit-Testrunner aus.
 \end{enumerate}
 \newslide
-\subsubsection{Concordion}
+\subsection{Concordion}
 Einen ähnlichen Ansatz wie Fit verfolgt Concordion. Die Testfälle
 werden in HTML-Format abgelegt und anschliessend von den
 Entwicklern mit speziellen Ausführungsanweisungen und
@@ -2339,7 +2339,7 @@ JUnit verwendet und die Ergebnisse werden als HTML-Dokument abgespeichert.
 \end{centering}
 %
 
-\subsection{Aufgaben}
+\section{Aufgaben}
 \begin{enumerate}
 \item Erg"anzen Sie das \verb|LED WebApp| Projekt mit einem Logger.
 \item Implementieren Sie an einer geeigneten Stelle im \verb|LED WebApp| Projekt
@@ -2354,7 +2354,7 @@ automatisch zu pr"ufen.
 \end{enumerate}
 
 \newslide
-\subsection{Software und weitere Informationen}
+\section{Software und weitere Informationen}
 \begin{itemize}
 \item Software Testing Portal:
 \href{http://en.wikipedia.org/wiki/Portal:Software_Testing}

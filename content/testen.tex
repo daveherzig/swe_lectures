@@ -1,4 +1,4 @@
-\section{Methodisches Testen}
+\chapter{Testing}
 %
 Testen ist ein Prozess zum Nachweis der Qualitätsmerkmale eines
 Produktes.
@@ -33,7 +33,7 @@ Grunds\"atze:
 \end{center}
 \end{figure}
 \newslide
-\subsection{Status Quo des Testens}
+\section{Status Quo des Testens}
 Testen ist typischerweise (Zitat Frank Westphal)
 \begin{itemize}
 \item  die letzte Phase in wasserfallartigen Projekten,
@@ -57,7 +57,7 @@ Effektives Testen muss:
 \end{itemize}
 \newslide
 %%
-\subsection{Begriffe (IEEE 610.12-90)}
+\section{Begriffe (IEEE 610.12-90)}
 \begin{description}
 \item[Failure] (Fehlerwirkung, Ausfall, Störung)
    Abweichung vom spezifizierten oder nachweisbar korrekten Betriebsverhalten.
@@ -83,7 +83,7 @@ Effektives Testen muss:
 %       according to its specification.
 %
 %\newpage
-\subsection{Vorgehen}
+\section{Vorgehen}
 %
 \ifslides
 \includegraphics[width=\linewidth]{qm/xfig/testprocess}\\
@@ -135,7 +135,7 @@ muss geplant werden und alle Schichten des Systems abdecken:
 \end{enumerate}
 %
 \newpage
-\subsection{Testmethoden}
+\section{Testmethoden}
 %\begin{longtable}{|p{4.5cm}|p{4.5cm}|p{5cm}|p{1cm}|} \hline
 \begin{tabularx}{\linewidth}{l|X}
 %\hline
@@ -193,7 +193,7 @@ Integrations-Test & Testen (inkrementell) zusammengefügter Teile
 \end{tabularx}
 %
 %\newpage
-\subsection{Dokumentation}
+\section{Dokumentation}
 %       \addcontentsline{toc}{subsection}{Dokumentation}
 % wikipedia!
 \begin{figure}[H]
@@ -232,7 +232,7 @@ Integrations-Test & Testen (inkrementell) zusammengefügter Teile
 %-------------------------------------------------------------------------
 %\kopf
 %\section*{Methodisches Testen}
-\subsection{Kode-Inspektionen}
+\section{Kode-Inspektionen}
 %       \addcontentsline{toc}{subsection}{Kode-Inspektionen}
 Das Lesen und die visuelle \"Uberpr\"ufung des Programms durch ein Testteam.
 \vspace{1cm}
@@ -264,7 +264,7 @@ Teilnehmer & T\"atigkeiten \\ \hline
 %-------------------------------------------------------------------------
 %\kopf
 %\section*{Methodisches Testen}
-\subsubsection{Java Inspection Checklist}
+\subsection{Java Inspection Checklist}
 %       \addcontentsline{toc}{subsection}{Fehler-Checkliste}
 %Die Erfahrung zeigt, dass immer wieder die gleichen Fehler gemacht werden.
 \begin{enumerate}
@@ -443,7 +443,7 @@ Teilnehmer & T\"atigkeiten \\ \hline
 
 (leicht angepasst an Java)
 \newpage
-\subsection{Testfall-Spezifikation}
+\section{Testfall-Spezifikation}
 Beispiel:
 \begin{lstlisting}[language=java]
   double M( double A, double B, double X ){
@@ -500,7 +500,7 @@ Beispiel:
 %%%   & &  &  &  &  & & & & & \\
 \end{tabular}
 \end{center}
-\subsubsection{Regeln f\"ur den Testfall-Entwurf}
+\subsection{Regeln f\"ur den Testfall-Entwurf}
 \begin{itemize}
 \item Richtige und falsche Eingabedaten aus der Spezifikation bilden.
 \item m\"oglichst alle Programmpfade abdecken.
@@ -509,7 +509,7 @@ Beispiel:
 \item m\"ogliche Fehler und Schwachstellen erraten.
 \end{itemize}
 \newslide
-\subsection{Aufgaben}
+\section{Aufgaben}
 \begin{enumerate}
 \item Erstellen Sie einen Satz von Testdaten, welche f"ur einen Blackbox Test in der
 StockQuoteRetriever Applikation verwendet werden kann.

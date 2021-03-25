@@ -1,43 +1,75 @@
 % TODO https://trello.com/
 %
 \chapter{Software Configuration Management}
-Als Konfiguration eines Systems bezeichnet man die Festlegung seiner
-Elemente mit ihren Versionen resp. Varianten:
-(\href{http://www.software-kompetenz.de/?22704}
-{www.software-kompetenz.de/?22704})
+In software engineering, software configuration management is the
+task of tracking and controlling changes in the software, part of the
+larger cross-disciplinary field of configuration management.
+Software configuration management practices include revision control
+and the establishment of baselines. If something goes wrong,
+software configuration management can determine what was changed and
+who changed it. If a configuration is working well, software configuration
+management can determine how to replicate it across many hosts.
+%Als Konfiguration eines Systems bezeichnet man die Festlegung seiner
+%Elemente mit ihren Versionen resp. Varianten:
+%(\href{http://www.software-kompetenz.de/?22704}
+%{www.software-kompetenz.de/?22704})
 \begin{quote}
-Eine Konfiguration ist ein Entwicklungsstand eines Produkts, in dem neben dem
-Quellcode und der Dokumentation sämtliche Werkzeuge und Hilfsmittel zum
-Erzeugen einer lauffähigen Version zusammengefasst sind. Das schließt auch die
-Dokumentation und die Einstellungen bzw. verwendete Parameter der Werkzeuge
-und Hilfsmittel ein.
+A configuration is a defined stage of a product. This stage will contain
+\begin{itemize}
+\item Source code
+\item Documentation
+\item Config files
+\item Tools
+\item ... and all other specific things which are relevant for that product stage
+\end{itemize}
+%Eine Konfiguration ist ein Entwicklungsstand eines Produkts, in dem neben dem
+%Quellcode und der Dokumentation sämtliche Werkzeuge und Hilfsmittel zum
+%Erzeugen einer lauffähigen Version zusammengefasst sind. Das schließt auch die
+%Dokumentation und die Einstellungen bzw. verwendete Parameter der Werkzeuge
+%und Hilfsmittel ein.
 \end{quote}
 \newslide
-Softwaresysteme sind aus vielfältigen Gründen \"Anderungen unterworfen:
-Strategie- und Marketingentscheidungen, Fehlerbehebungen, Kundenforderungen,
-nicht mehr unterstützte Softwareversionen von Drittherstellern etc.
+There are several reasons why a software system is going through changes:
+\begin{itemize}
+\item New features
+\item Bug fixes
+\item New requirements
+\item New libraries
+\end{itemize}
+
+%Softwaresysteme sind aus vielfältigen Gründen \"Anderungen unterworfen:
+%Strategie- und Marketingentscheidungen, Fehlerbehebungen, Kundenforderungen,
+%nicht mehr unterstützte Softwareversionen von Drittherstellern etc.
 
 \newslide
-Änderungen betreffen meist unterschiedliche, von einander abhängige Elemente
+%Änderungen betreffen meist unterschiedliche, von einander abhängige Elemente
+Changes are affecting the following elements
 \begin{itemize}
-\item Anforderungskatalog, Spezifikation, Pflichtenheft
-\item Designspezifikation
-\item Testplan, Testreport, Testspezifikation
-\item Projektplan
-\item Quell-Kode
-\item Makefiles
-\item Produkte von Drittherstellern (Compiler, Libraries, Datenbank \ldots)
-\item Benutzerhandbuch, Administrationsanweisungen
-\item Ausbildungsunterlagen, Marketingbrochuren,
+\item Requirements analysis
+\item Design specification
+\item Test specification
+\item Project plan
+\item Source code
+\item Build files
+\item 3rd party tools (Compiler, Libraries, Database \ldots)
+\item User guide, operating guide
+\item Training guide,
 \item \ldots
 \end{itemize}
-Unkontrolliert durchgeführte Änderungen an einem oder mehreren Elementen
-können unversehends zu Funktionsstörungen oder anderen Inkonsistenzen
-führen.
 
-Deshalb: Um die Integrität und Rückverfolgbarkeit eines Softwaresystems zu
-gewährleisten, muss ein
-systematischer Änderungsprozess betrieben werden:
+Uncontrolled changes on one or more of these elements could finally end
+up with software failures.\\
+
+%Unkontrolliert durchgeführte Änderungen an einem oder mehreren Elementen
+%können unversehends zu Funktionsstörungen oder anderen Inkonsistenzen
+%führen.
+
+Because of that, it is important to track every change in a software system
+to ensure re-traceability.
+
+%Deshalb: Um die Integrität und Rückverfolgbarkeit eines Softwaresystems zu
+%gewährleisten, muss ein
+%systematischer Änderungsprozess betrieben werden:
 \begin{quote}
 Configuration Management ... is a management process for establishing and
 maintaining consistency of a product's performance, its functional and
@@ -45,7 +77,7 @@ physical attributes, with its requirements, design and operational
 information, throughout its life. (ANSI/EIA)
 \end{quote}
 \newpage
-\section{Gliederung (IEEE/SWEBOK)}
+\section{Classification (IEEE/SWEBOK)}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\linewidth]{config-management/scm-activities}
@@ -65,26 +97,52 @@ information, throughout its life. (ANSI/EIA)
   Prozesses, Release-Management und Auslieferung, unter Berücksichtigung des
   Projektumfanges
   \end{itemize}
-\item \underline{Configuration Identification} (Identifikation):
- Festlegung und Beschreibung der Bezugskonfiguration (Baseline),
-  Markierung der Elemente, Aufnahme in die Konfiguration,
-  Zulassungsverfahren (approval), Bezeichnung der Software-Bibliotheken
-\item \underline{Control} (Steuerung):
-  formelle Organisation und Behandlung von Änderungen,
-  Strukturierung der Anfragen (Requests), Abschätzung der Auswirkungen,
-  Durchführung und Freigabe, Umgang mit Abweichungen (Verzichtserklärungen)
-\item \underline{Status Accounting} (Buchführung): Aufzeichnung der Aktivitäten mit
-  Terminangaben und
-  kommentierenden Erläuterungen, Ablageverfahren, Berichterstattung
-\item \underline{Auditing} (Überwachung): Einhaltung der Vorgaben,
-  Durchführung von Audits
+\item \underline{Configuration Identification}:
+  Software configuration identification identifies items to be
+  controlled, establishes identification schemes for the items and
+  their versions, and establishes the tools and techniques to be
+  used in acquiring and managing controlled items. These activities
+  provide the basis for the other software configuration management
+  activities.
+  %Festlegung und Beschreibung Software configuration status accounting (SCSA) is an element of configuration management consisting of the recording and reporting of information needed to manage a configuration effectively. der Bezugskonfiguration (Baseline),
+  %Markierung der Elemente, Aufnahme in die Konfiguration,
+  %Zulassungsverfahren (approval), Bezeichnung der Software-Bibliotheken
+\item \underline{Control}:
+  Software configuration control is concerned with managing changes
+  during the software life cycle. It covers the process for
+  determining what changes to make, the authority for approving certain
+  changes, support for the implementation of those changes,
+  and the concept of formal deviations from project requirements as
+  well as waivers of them. Information derived from these activities
+  is useful in measuring change traffic and breakage as well as aspects
+  of rework.
+  %formelle Organisation und Behandlung von Änderungen,
+  %Strukturierung der Anfragen (Requests), Abschätzung der Auswirkungen,
+  %Durchführung und Freigabe, Umgang mit Abweichungen (Verzichtserklärungen)
+\item \underline{Status Accounting}:
+  Software configuration status
+  accounting (SCSA) is an element of configuration management
+  consisting of the recording and reporting of information needed to
+  manage a configuration effectively.
+%Aufzeichnung der Aktivitäten mit
+%  Terminangaben und
+%  kommentierenden Erläuterungen, Ablageverfahren, Berichterstattung
+\item \underline{Auditing}:
+  A software audit is an independent examination of a work product or set
+  of work products to assess compliance with specifications, standards,
+  contractual agreements, or other criteria.
+  %Einhaltung der Vorgaben,
+  %Durchführung von Audits
 %Evaluation von Verbesserungen
-\item \underline{Release Processing} (Release-Managemement und Auslieferung):
-  Festlegung,
-  Erstellung und
-  Beschreibung der auszuliefernden Konfiguration (Release Notes: neue
-  Funktionalität, bekannte
-  Einschränkungen und Probleme, Plattform-Anforderungen), Mitteilung an Kunden
+\item \underline{Release Processing}:
+  Release processing refers to the distribution of a software
+  configuration item outside the development activity; this includes
+  internal releases as well as distribution to customers.
+  %Festlegung,
+  %Erstellung und
+  %Beschreibung der auszuliefernden Konfiguration (Release Notes: neue
+  %Funktionalität, bekannte
+  %Einschränkungen und Probleme, Plattform-Anforderungen), Mitteilung an Kunden
 \end{itemize}
 %\newpage
 %----------------------------------------------------------------------

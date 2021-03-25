@@ -1,42 +1,84 @@
 
 \chapter{Software Version Control}
-Die wichtigsten Aufgaben eines Versionsverwaltungssystems
-sind:
+Version control (also known as revision control,
+source control, or source code management) is a class of systems
+responsible for managing changes to computer programs, documents,
+web sites, or other collections of information. Version control is a
+component of software configuration management.\\
+
+\vspace{3mm}
+
+A version control system serves the following purposes, among others:
 \begin{enumerate}
-\item
-% die Speicherung der Fileversionen (Revisions) mit \"Anderungskommentar,
- die Protokollierung der Änderungen, damit jederzeit nachvollzogen
-                 werden kann, wer wann was (warum) geändert hat.
-\item die eindeutige Kennzeichnung der Versionen und ihrer
-  Abhängigkeiten (Baumstruktur),
-\item die Zugriffsregelung und (wenn möglich) automatische Abgleichung
-  bei gleichzeitigen Modifikationen (Mehrbenutzerfähigkeit),
-\item Wiederherstellung bestimmter Änderungszustände/Releases
+%\item die Speicherung der Fileversionen (Revisions) mit \"Anderungskommentar,
+% die Protokollierung der Änderungen, damit jederzeit nachvollzogen
+% werden kann, wer wann was (warum) geändert hat.
+%\item die eindeutige Kennzeichnung der Versionen und ihrer
+% Abhängigkeiten (Baumstruktur),
+%\item die Zugriffsregelung und (wenn möglich) automatische Abgleichung
+% bei gleichzeitigen Modifikationen (Mehrbenutzerfähigkeit),
+%\item Wiederherstellung bestimmter Änderungszustände/Releases
 % die Gruppierung von Fileversionen zu Releases (Snapshots)
 %\item
 % Gleichzeitige Entwicklung mehrerer Entwicklungszweige (engl. Branches) eines
 % Projektes (z.B. stabile Release-Version und  und Entwicklerversion mit
 % größeren, nicht getesteten Änderungen)
+\item Version control gives access to historical versions of your project.
+\item You can reproduce and understand a bug report on a
+past version of your software.
+\item Version control enables multiple people to simultaneously
+work on a single project. Each person edits his or her own copy
+of the files and chooses when to share those changes with the
+rest of the team.
 \end{enumerate}
 \ifslides
 \newpage
 \fi
-Es existieren zahlreiche kommerzielle und freie Softwarepakete, die sich in
-die beiden Kategorien einteilen lassen:
+%Es existieren zahlreiche kommerzielle und freie Softwarepakete, die sich in
+%die beiden Kategorien einteilen lassen:
+There are a number of available systems for version control. They all could
+be divided into two categories:
 \begin{description}
-\item[Zentrale Systeme] Diese Systeme zeichnen sich durch eine zentrales
-  Archiv (Repository) aus, wo die Originaldateien abgelegt sind. Beispiele sind:
+\item[Centralized]
+In centralized version control, each user gets his or her own working
+copy, but there is just one central repository. As soon as you
+commit, it is possible for your co-workers to update and to see
+your changes.\\
+\includegraphics[width=0.5\linewidth]{config-management/version-control-fig2.png}\\
+For others to see your changes, 2 things must happen:
+\begin{itemize}
+\item You commit
+\item They update
+\end{itemize}
+
+%Diese Systeme zeichnen sich durch eine zentrales
+%  Archiv (Repository) aus, wo die Originaldateien abgelegt sind. Beispiele sind:
+Typical systems are:
   \begin{itemize}
-  \item CVS: früher weit verbreitet
-  \item Subversion: Nachfolger von CVS mit einigen Verbesserungen
+  \item CVS
+  \item Subversion
   \end{itemize}
-\item[Dezentrale Systeme] bei diesen Systemen sind die Dateien lokal auf den
-  jeweiligen Entwicklungssystemen abgelegt (Distributed Version
-  Control System DVCS). Beispiele sind:
+
+\item[Distributed]
+In distributed version control, each user gets his or her own
+repository and working copy. After you commit, others have no access
+to your changes until you push your changes to the central repository.
+A pull needs to be executed to get new data into your local repository.\\
+\includegraphics[width=0.5\linewidth]{config-management/version-control-fig3.png}\\
+For others to see your changes, 3 things must happen:
+\begin{itemize}
+\item You commit
+\item You push
+\item They pull/fetch
+\end{itemize}
+  %bei diesen Systemen sind die Dateien lokal auf den
+  %jeweiligen Entwicklungssystemen abgelegt (Distributed Version
+  %Control System DVCS). Beispiele sind:
+Typical systems are:
   \begin{itemize}
   \item GNU Arch
   \item Bazaar-NG
-  \item BitKeeper (kommerziell)
+  \item BitKeeper
   \item Git
   \item Monotone
   \item Mercurial
@@ -45,55 +87,81 @@ die beiden Kategorien einteilen lassen:
 \ifslides
 \newpage
 \fi
-Ein weiteres Unterscheidungsmerkmal ist die Arbeitsweise:
+
+There is also another way to classify version control systems:
+
 \begin{description}
-\item[Lock-Modify-Unlock] (Pessimistic Revision Control) Einzelne Dateien müssen vor einer
-  Än\-derung gesperrt und nach Abschluss der Änderung wieder freigegeben werden.
-\item[Copy-Modify-Merge] (Optimistic Revision Control)
-   Die Dateien können von allen Benutzern
-  geändert werden. Gleichzeitig durchgeführte Änderungen werden anschliessend
-  entweder automatisch oder manuell zusammengeführt.
+\item[Lock-Modify-Unlock] (Pessimistic Revision Control)\\
+Many version control systems use a lock-modify-unlock model to
+address the problem of many authors clobbering each other's work.
+In this model, the repository allows only one person to change a
+file at a time. This exclusivity policy is managed using locks.
+%Einzelne Dateien müssen vor einer
+%  Än\-derung gesperrt und nach Abschluss der Änderung wieder freigegeben werden.
+\item[Copy-Modify-Merge] (Optimistic Revision Control)\\
+Other version control systems use a copy-modify-merge model as an
+alternative to locking. In this model, each user's client contacts the
+project repository and creates a personal working copy. This is a local
+reflection of the repository's files and directories.
+Users then work simultaneously and independently, modifying their
+private copies. Finally, the private copies are merged together into a
+new, final version. The version control system often assists with
+the merging, but ultimately a human being is responsible for making it
+happen correctly.
+%   Die Dateien können von allen Benutzern
+%  geändert werden. Gleichzeitig durchgeführte Änderungen werden anschliessend
+%  entweder automatisch oder manuell zusammengeführt.
 \end{description}
 %%% End:
 \newslide
 \newpage
 \section{Git}
-GIT\footnote{englischer Slangausdruck: Blödmann, Depp}
- ist ein einfaches, von Linus Torvalds 2005 für das
- Linux-Kernel-Projekt
-in wenigen Monaten entwickeltes
-Versionsverwaltungssystem. Torvalds nennt es ein ``stupid
-(but extremely fast) directory content manager''. Anstoss dazu gab eine
-längere Auseinandersetzung mit dem Hersteller von BitKeeper, dem bis anhin von
-den Kernel-Entwicklern eingesetzten
-Versionsverwaltungssystems. Hauptkritikpunkt
-an CVS und anderen quell-offenen Paketen waren Performance-Probleme, die bei
-der grossen Anzahl von Dateien (mehr als 30 000) und der hohen Änderungsrate
-auftraten: ``Taking tens of seconds to apply a patch just because the source
-base is big is just not acceptable''. Mittlerweile geniesst Git (nebst
-Mercurial) eine grosse Popularität und wird in einer wachsenden Zahl von
-kleinen bis hin zu sehr grossen Projekten eingesetzt.
+Git is software for tracking changes in any set of files,
+usually used for coordinating work among programmers collaboratively
+developing source code during software development. Its goals include
+speed, data integrity, and support for distributed, non-linear workflows
+(several branches running on different systems).\\
+
+Git was created by Linus Torvalds in 2005 for development of the
+Linux kernel, with other kernel developers contributing to its initial
+development. Since 2005, Junio Hamano has been the core maintainer.
+As with most other distributed version control systems, and unlike most
+client–server systems, every Git directory on every computer is a
+full-fledged repository with complete history and full version-tracking
+abilities, independent of network access or a central server.
+Git is free and open-source software
+
+%GIT\footnote{englischer Slangausdruck: Blödmann, Depp}
+% ist ein einfaches, von Linus Torvalds 2005 für das
+% Linux-Kernel-Projekt
+%in wenigen Monaten entwickeltes
+%Versionsverwaltungssystem. Torvalds nennt es ein ``stupid
+%(but extremely fast) directory content manager''. Anstoss dazu gab eine
+%längere Auseinandersetzung mit dem Hersteller von BitKeeper, dem bis anhin von
+%den Kernel-Entwicklern eingesetzten
+%Versionsverwaltungssystems. Hauptkritikpunkt
+%an CVS und anderen quell-offenen Paketen waren Performance-Probleme, die bei
+%der grossen Anzahl von Dateien (mehr als 30 000) und der hohen Änderungsrate
+%auftraten: ``Taking tens of seconds to apply a patch just because the source
+%base is big is just not acceptable''. Mittlerweile geniesst Git (nebst
+%Mercurial) eine grosse Popularität und wird in einer wachsenden Zahl von
+%kleinen bis hin zu sehr grossen Projekten eingesetzt.
 
 \newslide
-Wichtige Unterschiede zu Subversion sind
+The most important features are:
 \begin{itemize}
-\item \structure{Verteilte Repositories}: jede/r
-Bearbeiter/-in hat ein eigenes, lokales Repository im Unterverzeichnis
-.git des Arbeitsverzeichnis. Ein spezielles Repository,
-ein sogenanntes ``Bare Repository'', kann eingerichtet werden
-um die Dateien anderen zugänglich zu machen.
-\item \structure{Branches und Tags}: es gibt keine
-  Trunk/Tags/Branches-Verzeichnisse. Tags und Branches sind Teil
-  des Repository's.
-\item \structure{Revision-Bezeichner}: Statt ganzzahliger
-  Revision-Bezeichner werden SHA1-Werte verwendet.
-  Die aktuellste Revision kann mit dem Bezeichner HEAD referenziert werden.
-\item \structure{Snapshots statt Änderungen}:
-     Git speichert keine Änderungen, sondern bildet bei
-jedem Commit einen Snapshot, der ein komprimiertes Abbild aller
-verwalteten Dateien darstellt. (Unveränderte Dateien werden verlinkt).
-\item \structure{Zustände}: Dateien haben einen Zustand: untracked,
-  modified, staged, commited
+\item \structure{Distributed repositories}:\\
+each user gets his or her own repository and working copy.
+\item \structure{Branches and tags}:\\
+Branches and tags are part of the repository (compared to centralized systems)
+\item \structure{Revision identifier}:\\
+The SHA1 of the commit is the hash of all the information.
+\item \structure{Commits are snapshots}:\\
+In other version control systems, changes to individual files are tracked
+and referred to as revisions, but with git you are tracking the entire
+workspace, so they use the term snapshot to denote the difference.
+\item \structure{Stages}: Files have one of the following stages: untracked,
+  modified, staged, committed
 \end{itemize}
 
 %\begin{itemize}
@@ -111,30 +179,37 @@ verwalteten Dateien darstellt. (Unveränderte Dateien werden verlinkt).
 %\item Fast alle Operationen sind lokal
 %\end{itemize}
 
-Git unterscheidet 4 Objekt-Typen:
+%Git unterscheidet 4 Objekt-Typen:
+\subsection{Git Object Store}
+The object store contains the original data files and all the log
+messages, author information, dates, and other information required to
+rebuild any revision or branch of the project.\\
+There are 4 different object types:
 \begin{itemize}
-\item \structure{Blob}: eine Byte-Sequenz (eine Datei: Text, Bild etc.)
-\item \structure{Tree}: ein Verzeichnis, kann Blobs und andere Trees enthalten
-\item \structure{Commit}: ein Zustand, enthält einen Verweis auf den Tree, einen
-  Parent und Meta-Informationen (Autor, Zeitstempel etc.)
-\item \structure{Tag}: eine Markierung eines Commits
+\item \structure{Blob}: A blob is used to store file data. It is generally a file.
+\item \structure{Tree}: A tree is basically like a directory.
+It references a bunch of other trees and blobs
+\item \structure{Commit}: A commit object holds metadata for each change
+introduced in the repository, including the author, committer, commit-data,
+and log messages.
+\item \structure{Tag}: A tag object assigns an arbitrary human-readable
+name to a specific object usually a commit.
 \end{itemize}
 %\ifslides
 %\else
 %\newpage
 %\fi
-Alle Git-Objekte besitzen einen 160bit-Hash-Key, der
- mit 40 ASCII-Zeichen (Hex-Code)
-dargestellt wird:
+All Git objects have a 160 bit hash key:
 \begin{lstlisting}
 6ff87c4664981e4397625791c8ea3bbb5f2279a3
 \end{lstlisting}
-Git-Objekte sind dadurch mit sehr hoher Wahrscheinlichkeit global
-eindeutig.
+There is a very high probability, that Git objects are globally unique.\\
+
+\vspace{3mm}
 
 \newslide
-Git-Objekte sind im Verzeichnis .git/objects abgelegt und bilden einen
-Directed Acyclic Graph (DAG):
+Git objects are stored in the \verb|.git| directory. They are reflecting a
+directed acyclic graph:
 \ifslides
 \begin{center}
   \includegraphics[width=0.7\linewidth]{config-management/git-objects}
@@ -143,32 +218,26 @@ Directed Acyclic Graph (DAG):
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\linewidth]{config-management/git-objects}
-  \caption[Git-Objekte und Referenzen]{Git-Objekte und Referenzen \\
+  \caption[Git-Objekte und Referenzen]{Git objects and references \\
 (Source: \href{http://teohm.github.com/blog/2011/05/30/learning-git-internals-by-example}
                 {teohm.github.com/blog/2011/05/30/learning-git-internals-by-example})}
   \label{fig:gitobjects}
 \end{figure}
 \fi
 \newslide
-Ein Hauptvorteil von Git gegenüber anderen Systemen ist der sehr
-flexible und einfache Umgang mit Branches, die bei
-Git eine wichtige Rolle spielen. Branches werden
-zum Beispiel verwendet für
+One of the biggest advantages of Git compared to other systems is the easy
+handling of branches. Branches are needed for:
 \begin{itemize}
-\item das Durchführen von Experimenten
-\item das Ausprobieren von Ideen
-\item die Entwicklung verschiedener Features
+\item executing experiments
+\item try out new ideas
+\item development of new features
 \end{itemize}
-oder ganz allgemein, wenn man etwas modifzieren möchte.
-
-Git ist mehr als nur ein Werkzeug, es ist auch ein Paradigma.
-Es bringt neue Ideen und
-räumt mit einigen bisher als inhärent geltenden Einschränkungen auf.
-Wenn man git verwendet, vergisst man am besten, was man bisher über
-Versionsverwaltung zu wissen glaubte.
+Or in general, for any type of modification.\\
+In some software projects, it is forbidden to push directly to the master
+branch. Therefore it is needed to create a branch for each modification.
 %
 \newslide
-\subsection{Die wichtigsten Befehle}
+\subsection{Git commands}
 \ifslides
 \begin{center}
   \includegraphics[width=0.65\linewidth]{config-management/xfig/git-workflow}
@@ -177,16 +246,17 @@ Versionsverwaltung zu wissen glaubte.
 \begin{figure}[H]
 \centering
   \includegraphics[width=0.95\linewidth]{config-management/xfig/git-workflow}
-\caption{Der typische Arbeitsablauf bei Git}
+\caption{Workflow with git}
 \end{figure}
 \fi
 \begin{enumerate}
-\item \underline{config}: Benutzername und E-Mail-Adresse festlegen:
+\item \underline{config}: Define user name and mail address:
   \begin{lstlisting}
-$ git config --global user.name "Ronald Tanner"
-$ git config --global user.email "ronald.u.tanner@gmail.com"
+$ git config --global user.name "David Herzig"
+$ git config --global user.email "dave.herzig@gmail.com"
   \end{lstlisting}
-Dadurch wird im Home-Verzeichnis die Datei \verb+.gitconfig+ angelegt.
+This information will be stored in the home directory in a file called
+\verb+.gitconfig+.
 
 Es gibt 3 Orte für
 Config-Dateien: per User, per Repository, per System. Lässt man
@@ -595,7 +665,7 @@ Which parts of the project should NOT be in the repository?
 \item Create a tag which marks the software with \verb|V0_1|
 \item Verify in the web console (Github, Gitlab) if
 everything is correct.
-\item Create a branch a perform a modification on that branch.
+\item Create a branch and perform a modification on that branch.
 \item Merge the branch into the master branch.
 \end{itemize}
 
