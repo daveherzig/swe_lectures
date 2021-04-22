@@ -146,60 +146,60 @@ information, throughout its life. (ANSI/EIA)
 \end{itemize}
 %\newpage
 %----------------------------------------------------------------------
-\section{Versionen, Revisionen und Ausgaben}
-Ein File (Dokument) kann verschiedene Versionen haben:
+\section{Versions, Revisions and Releases}
+A file could have several versions:
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{config-management/xfig/file-revisions}
 \end{center}
-\caption{Die Versionen einer Datei}
+\caption{Versions of a file}
 \end{figure}
-Sie werden \underline{Revisionen} (engl. Revisions) genannt.
+They are called \emph{Revisions}.
 
 \ifslides
 \else
-Ebenso kann ein Softwareprodukt mehrere Versionen haben. Man
-nennt sie \underline{Ausgaben} (engl. Releases). Ihre Sourcefiles
-haben jedoch unterschiedliche Versionen:
+A software product could also have several versions. These
+versions are called \emph{Releases}. All the source code files
+within a release could have different versions:
 
 \fi
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{config-management/xfig/releases}
 \end{center}
-\caption{Die Versionen eines Produktes}
+\caption{Versions of a software product}
 \end{figure}
 \newslide
 
-Die Entwicklung erfolgt normalerweise entlang des Hauptastes
-(Trunk oder Master). In mehreren Zyklen werden Dateien modifiziert,
-hinzugefügt, gelöscht und umbenennt.
+The development follows the master (or trunk) branch. In several
+cycles, files are being added, deleted, renamed and/or modified.\\
 
-Bevor ein neuer Release gebildet wird, empfiehlt es sich
-eine Verzweigung (Branch) zu erstellen. Dieser Moment wird auch als
-``Code'' resp. ``Feature freeze'' bezeichnet, da innerhalb dieser Verzweigung
-keine funktionalen Erweiterungen sondern nur noch diejenigen
-Änderungen durchgeführt werden, die für die Integrations- und
-Systemtests nötig sind. Nach Abschluss dieser Phase sollten die
-Änderungen wieder mit dem Hauptast zusammengeführt werden.
+There are several ways on working with branches. One possibility is to
+create a new branch before a release. This branch is often called
+\emph{feature freeze} or \emph{code freeze}. In this branch, no more
+features will be added. Only bug fixes will be done to increase the quality
+and to pass all tests.\\
+After the release, this branch should be merged into the master branch.
+
 \begin{figure}[H]
 \begin{center}
   \includegraphics[width=0.9\linewidth]{config-management/xfig/release-branch}
 \end{center}
-\caption{Release-Bildung mit Branches und Merges}
+\caption{Release with branches and merges}
 \end{figure}
-Die nicht mit dem Release beschäftigten Entwickler können während der
-Release-Bildung auf dem Trunk weiterarbeiten.
+Developers which are not part of the release could continue their work on
+the master branch.\\
+
+\vspace{3mm}
 
 \newslide
-Für die Release-Bezeichnung empfiehlt es sich, ein einfaches und
-nachvollziehbares Schema
-anzuwenden. Z. B: {\bfseries major.minor.patch}
+For the identification of releases, a simple scheme could be used:
+{\bfseries major.minor.patch}
 
 \begin{tabular}{ll}
-Major: & umfangreiche Änderungen oder Erweiterungen\\
-Minor: & zusätzliche Funktionalitäten\\
-Patch: & Fehlerbehebungen oder geringfügige Verbesserungen\\
+Major: & Bigger changes (new architecture)\\
+Minor: & Smaller changes (adding new features)\\
+Patch: & Bug fixes or minor improvements\\
 \end{tabular}
 
 % Siehe http://apr.apache.org/versioning.html
@@ -213,27 +213,25 @@ Patch: & Fehlerbehebungen oder geringfügige Verbesserungen\\
 \includegraphics[width=0.65\linewidth]{config-management/xfig/changemgmt}\\[2ex]
 \end{center}\else
 \includegraphics[width=\linewidth]{config-management/xfig/changemgmt}
-\caption{Der Änderungsprozess}
+\caption{Change management process}
 \fi
 \end{figure}
 \begin{minipage}[t]{0.48\linewidth}
-\subsection*{Bug and Issue Tracking} %Problembehandlung
+\subsection{Bug and Issue Tracking} %Problembehandlung
 \begin{itemize}
-\item Erfassung und Verwaltung aller eingehender Fehlermeldungen
-  und \"Anderungsanträgen
-\item Entscheidung über die Bearbeitung der Meldungen unter Berücksichtigung
- der technischen und zeitlichen Auswirkungen
-\item Abschluss der \"Anderung und Information der Betroffenen
+\item Reporting and management of all incoming bug reports and change requests
+\item Decision about the request processing under consideration of
+time and technical impacts.
+\item Close request and inform involved people.
 \end{itemize}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\linewidth}
 \subsection{Version Control}
 \begin{itemize}
-\item Eindeutige Kennzeichnung der Software-Elemente
-\item Einfrieren von Zwischenergebnissen
-\item Sicherstellen dass auf vorangegangene Versionen
-  zurückgegriffen werden kann
+\item Unique identifiers of software components
+\item Freeze of results
+\item Ensure that older releases could be accessed
 \end{itemize}
 \end{minipage}
 \newslide

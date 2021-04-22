@@ -237,6 +237,7 @@ In some software projects, it is forbidden to push directly to the master
 branch. Therefore it is needed to create a branch for each modification.
 %
 \newslide
+\newpage
 \subsection{Git commands}
 \ifslides
 \begin{center}
@@ -258,18 +259,30 @@ $ git config --global user.email "dave.herzig@gmail.com"
 This information will be stored in the home directory in a file called
 \verb+.gitconfig+.
 
-Es gibt 3 Orte für
-Config-Dateien: per User, per Repository, per System. Lässt man
-die
-Option \verb+--global+ weg, dann wird die Einstellung in der
-Config-Datei des aktuellen Repository's abgelegt.
+There are 3 locations/levels for config files:
+\begin{itemize}
+\item User level
+\item Repository level
+\item System level
+\end{itemize}
+
+If you remove the \verb|--global| switch, the configuration will be
+stored in the current repository.
+
+%Es gibt 3 Orte für
+%Config-Dateien: per User, per Repository, per System. Lässt man
+%die
+%Option \verb+--global+ weg, dann wird die Einstellung in der
+%Config-Datei des aktuellen Repository's abgelegt.
 %
 \newslide
-\item \underline{init}: ein neues Repository einrichten. Man
-  unterscheidet lokale (private) und synchronisierbare (shared)
-  Repositories, die anderen Benutzer zugänglich gemacht werden können.
+\item \underline{init}:
+  create a new repository.
+%  ein neues Repository einrichten. Man
+%  unterscheidet lokale (private) und synchronisierbare (shared)
+%  Repositories, die anderen Benutzer zugänglich gemacht werden können.
 
-Ein leeres, lokales Repository im aktuellen Verzeichnis einrichten:
+Create an empty local repository in the current directory:
   \begin{lstlisting}
 $ cd /home/user/projects
 $ git init project1
@@ -279,23 +292,28 @@ Initialized empty Git repository in /home/user/projects/project1/.git
 \includegraphics[width=0.25\linewidth]{config-management/git-repository-files}
 \end{center}
 %
-{\bfseries Bemerkung:} Um ein lokales Repository aus einem bereits existierenden
-zu erzeugen, muss anstelle von ``init'' der Befehl ``clone'' verwendet
-werden:
+{\bfseries Note:} To create a local repository from an existing one,
+the command \verb|init| needs to be replaced with \verb|clone|.
+
+%Um ein lokales Repository aus einem bereits existierenden
+%zu erzeugen, muss anstelle von ``init'' der Befehl ``clone'' verwendet
+%werden:
+
 \begin{lstlisting}
 $ git clone file:///var/git/project1.git
 \end{lstlisting}
 %
 \newslide
-\item \underline{add}: Dateien in den Index aufnehmen.
+\item \underline{add}: Adds files in the to the staging area for Git.
   \begin{lstlisting}
 $ cd project1
 $ git add .
   \end{lstlisting}
 %$
-Alle im aktuellen Verzeichnis liegenden Dateien und Unterverzeichnisse
-werden in die Versionsverwaltung aufgenommen (genauer: dem
-Stage-Bereich, resp. dem Index hinzugefügt)
+All files in the current directory and sub directories will be added.
+%Alle im aktuellen Verzeichnis liegenden Dateien und Unterverzeichnisse
+%werden in die Versionsverwaltung aufgenommen (genauer: dem
+%Stage-Bereich, resp. dem Index hinzugefügt)
 %%% git config --global http:sslVerify false
 %% env GIT_SSL_NO_VERIFY=true git clone ....
 %
@@ -325,16 +343,18 @@ Stage-Bereich, resp. dem Index hinzugefügt)
 %% git config --global credential.helper cache
 %%
 \newslide
-\item \underline{commit}: übertragen der Änderungen aus dem Index in
-  den Master-Branch des Repository's:
+\item \underline{commit}: Record the changes made to the files to a local repository. For easy reference, each commit has a unique ID:
   \begin{lstlisting}
 $ git commit -m "initial commit"
   \end{lstlisting}
 %$
-{\bfseries Bemerkung}: modifizierte Dateien müssen vorgängig mit ``add'' in den
-  Stage-Bereich kopiert werden, wenn sie in das Repository übertragen
-  werden sollen. Will man alle modifizierten Dateien übertragen, kann
-  man auch die Option ``-a'' angeben:
+{\bfseries Note}:
+  modified files needs to be added with the \verb|add| command.
+  Use the option \verb|-u| to add all modified files.
+  %modifizierte Dateien müssen vorgängig mit ``add'' in den
+  %Stage-Bereich kopiert werden, wenn sie in das Repository übertragen
+  %werden sollen. Will man alle modifizierten Dateien übertragen, kann
+  %man auch die Option ``-a'' angeben:
   \begin{lstlisting}
 $ git commit -am "another commit"
   \end{lstlisting}
@@ -343,188 +363,192 @@ $ git commit -am "another commit"
 \includegraphics[width=0.66\linewidth]{config-management/xfig/git-commited}
 \end{center}
 \newslide
-\item \underline{checkout}: das aktuelle Verzeichnis mit dem
-  Inhalt des lokalen Repository's aktualisieren.
-Üblicherweise wird dazu ein neuer Branch erstellt:
+\item \underline{checkout}: To start working in a different branch, use git checkout to switch branches.
+%Üblicherweise wird dazu ein neuer Branch erstellt:
   \begin{lstlisting}
 $ git checkout -b ticket-53
   \end{lstlisting}
 %$
 \newslide
-\item \underline{tag}: Markierungen erzeugen, anzeigen, löschen und
-  verifizieren. Eine neue Markierung des letzten Commit-Objektes erstellen:
+\item \underline{tag}: Git has the ability to tag specific points in a repository’s history as being important. Typically, people use this functionality to mark release points:
 \begin{lstlisting}
 $ git tag -a rel-0.0 -m "Release 0.0"
 \end{lstlisting}
 %$
-{\bfseries Bemerkungen}: Man unterscheidet lighweight und annotated
-Tags. Lightweight Tags werden ohne die Option \verb+-a+ (und ohne
-Kommentar) erstellt. Sie sind lediglich eine Referenz zu einem
-speziellen Commit. Annoted Tags werden als Objekte im Repository
-gespeichert und sind die bevorzugte Variante.
+{\bfseries Note}:
+Git supports two types of tags: lightweight and annotated.\\
+A lightweight tag is very much like a branch that doesn’t change.
+It’s just a pointer to a specific commit.\\
+Annotated tags, however, are stored as full objects in the Git database.
+They’re checksummed; contain the tagger name, email, and date;
+have a tagging message; and can be signed and verified with GNU
+Privacy Guard (GPG). It’s generally recommended that you create
+annotated tags so you can have all this information; but if you want
+a temporary tag or for some reason don’t want to keep the other
+information, lightweight tags are available too.
 
-Alle Markierungen anzeigen:
+%Man unterscheidet lighweight und annotated
+%Tags. Lightweight Tags werden ohne die Option \verb+-a+ (und ohne
+%Kommentar) erstellt. Sie sind lediglich eine Referenz zu einem
+%speziellen Commit. Annoted Tags werden als Objekte im Repository
+%gespeichert und sind die bevorzugte Variante.
+
+Display all tags:
 \begin{lstlisting}
 $ git tag -l
 \end{lstlisting}
 %$
 \newslide
 \item \underline{init}:
-Ein leeres, synchronisierbares Repository einrichten:
+This command turns a directory into an empty Git repository. This is the first step in creating a repository. After running git init, adding and committing files/directories is possible.
 \begin{lstlisting}
 $ git init --bare /var/git/project1.git
 \end{lstlisting}
 %$
-{\bfseries Bemerkung}: Bei Verwendung des Git-Daemons sollte das Repository
- dem Benutzer nobody gehören
-und der Benutzergruppe gitusers Lese- und Schreibberechtigung
-zugewiesen werden.
-Dazu muss jedoch der entsprechende Mount-Eintrag in /etc/fstab mit der
-Option acl (Access Control List) ergänzt werden. Beispiel:
-\begin{verbatim}
-/dev/sda3  /	ext3	noatime,acl	0 1
-\end{verbatim}
-Die Anweisungen lauten in diesem Fall:
-\begin{lstlisting}
-$ sudo groupadd gitusers
-$ sudo mkdir /var/git
-$ sudo chown nobody:nobody /var/git
-$ sudo -u nobody git init --bare /var/git/project1.git
-$ sudo setfacl -R -d -m g:gitusers:rwX /var/git/project1.git
-\end{lstlisting}
-% Siehe
-% http://www.techrepublic.com/article/learn-to-use-extended-filesystem-acls/6091748
-%  mount -v -o remount /
-%$ sudo usermod -a -G gitusers tar
-%
+
 \newslide
-\item \underline{push}: übertragen des Master-Branches
- des lokalen Repository's in ein
-  (oder mehrere) Remote-Repository:
+\item \underline{push}: Sends local commits to the remote repository. git push requires two parameters: the remote repository and the branch that the push is for.
   \begin{lstlisting}
 $ git remote add origin file:///var/git/project1
 $ git push origin master
   \end{lstlisting}
-{\bfseries Bemerkungen}:
+{\bfseries Note}:
 \begin{itemize}
-\item der Benutzer benötigt Schreibberechtigung
-im Remote-Repository.
-\item Mit ``remote add'' wird ein Alias für ein Remote-Repository
-  definiert (Hier: origin)
-\item Anzeige aller Remote-Repositories mit URL:
+\item User needs write permission on the repository.
+\item With ``remote add'' an alias for a remote repository will be generated (in this case origin)
+\item Display all remote repositories URL:
   \begin{lstlisting}
 $ git remote -v
   \end{lstlisting}
 %$
-\item Tags werden nicht automatisch aus dem lokalen Repository
-  übertragen. Sie müssen explizit angegeben werden:
+\item Tags are not automatically transferred to the remote repository. This
+needs to be done in addtion:
+%\item Tags werden nicht automatisch aus dem lokalen Repository
+%  übertragen. Sie müssen explizit angegeben werden:
   \begin{lstlisting}
 $ git push origin rel-0.0
   \end{lstlisting}
 %$
-oder alle zusammen:
+or all together:
 \begin{lstlisting}
 $ git push origin --tags
 \end{lstlisting}
 \end{itemize}
 %
-\item \underline{pull}: übertragen der Daten aus dem (default)
-  Remote-Repository's in das lokale Repository (fetch) und
-  zusammenfügen der Änderungen mit dem aktuellen Branch (merge)
+\item \underline{pull}: To get the latest version of a repository run git pull. This pulls the changes from the remote repository to the local computer.
   \begin{lstlisting}
 $ git pull
 \end{lstlisting}
 \end{enumerate}
 %$
-{\bfseries Bemerkung}: in der Git-Config-Datei sollte/kann das Default-Repository
-und der Default-Branch definiert werden:
+{\bfseries Note}:
+the default repository and default branch could/should be defined in the
+Git configuration file.
+%in der Git-Config-Datei sollte/kann das Default-Repository
+%und der Default-Branch definiert werden:
   \begin{lstlisting}
 git config branch.master.remote origin
 git config branch.master.merge refs/heads/master
   \end{lstlisting}
-Nach einer Git-Clone-Operation sind diese Werte automatisch gesetzt.
+These values are automatically set after a \verb|git clone| operation.
+%Nach einer Git-Clone-Operation sind diese Werte automatisch gesetzt.
 %
-\subsection{Weitere Funktionen}
+\subsection{Additional operations}
 \begin{itemize}
-\item Eine bestimmte Version wiederherstellen (mit Release-Nummer):
+\item Get a specific version:
   \begin{lstlisting}
 $ git checkout -b branch-0 rel-0.0
   \end{lstlisting}
 %$
-\item Anzeige der Änderungen einer Datei:
+\item Display changes of a file:
 \begin{lstlisting}
 $ git log Main.java
 \end{lstlisting}
 %$
-\item Detaillierte Anzeige der letzten beiden Änderungen einer Datei:
+\item Detailed display of the last 2 changes of a file:
+%\item Detaillierte Anzeige der letzten beiden Änderungen einer Datei:
 \begin{lstlisting}
 $ git log -p -2 Main.java
 \end{lstlisting}
 %$
-\item Detaillierte Anzeige Änderungen der letzten beiden Wochen:
+\item Detailed display of the changes in the last 2 weeks:
+%\item Detaillierte Anzeige Änderungen der letzten beiden Wochen:
 \begin{lstlisting}
 $ git log --sinde=2.weeks
 \end{lstlisting}
 %$
-\item Vergleich der Änderungen einer Datei mit Stage-Bereich:
+\item Display changes of a file in the stage area:
+%\item Vergleich der Änderungen einer Datei mit Stage-Bereich:
 \begin{lstlisting}
 $ git diff Main.java
 \end{lstlisting}
 %$
-\item Vergleich zwischen Stage-Bereich und Repository:
+\item Compare stage area and repository:
 \begin{lstlisting}
 $ git diff --staged
 \end{lstlisting}
 %$
-\item Dateien entfernen:
+\item Remove files:
 \begin{lstlisting}
 $ git rm Main.java
 \end{lstlisting}
-Die Datei wird nach einem Commit im Repository als gelöscht markiert.
+The file will be marked as deleted after the commit.
+%Die Datei wird nach einem Commit im Repository als gelöscht markiert.
 % $
-\item eine Datei umbenennen (verschieben):
+\item rename a file:
 \begin{lstlisting}
 $ git mv Main.java NewMain.java
 \end{lstlisting}
-Die Änderung wird nach einem Commit in das Repository übertragen.
+The changes will transferred into the repository after the commit.
+%Die Änderung wird nach einem Commit in das Repository übertragen.
 %$
-\item Zustand der Dateien im aktuellen Verzeichnis und darunter anzeigen
+\item display current state
 \begin{lstlisting}
 $ git status
 \end{lstlisting}
 \end{itemize}
 %$
-\subsection{Verzweigungen (Branches)}
-Änderungen werden bei Git in der Regel nicht direkt auf dem
-Master-Branch sondern in einem separaten Branch durchgeführt, der
-(in der Regel)
-nach Abschluss der Änderungen mit dem Master-Branch zusammengeführt und
-anschliessend gelöscht wird:
+\subsection{Branches}
+A branch in Git is simply a lightweight movable pointer to one of these
+commits. The default branch name in Git is master. As you start making
+commits, you’re given a master branch that points to the last commit you
+made. Every time you commit, the master branch pointer moves forward
+automatically.\\
+Changes are normally done on a branch. After the change is completed, the
+branch will be merged back into the master branch.
+%Änderungen werden bei Git in der Regel nicht direkt auf dem
+%Master-Branch sondern in einem separaten Branch durchgeführt, der
+%(in der Regel)
+%nach Abschluss der Änderungen mit dem Master-Branch zusammengeführt und
+%anschliessend gelöscht wird:
 \begin{itemize}
-\item Einen neuen Branch erstellen:
+\item Create new branch:
 \begin{lstlisting}
 $ git checkout -b ticket-53
 \end{lstlisting}
 %$
-\item Alle Branches anzeigen:
+\item Display all branches:
   \begin{lstlisting}
 $ git branch
   \end{lstlisting}
-{\bfseries Bemerkung}: mit -a werden auch die Remote-Branches angezeigt
+{\bfseries Note}: remote branches will be displayed by using the option
+\verb|-a|
 %$
-\item Rückgabe der Änderungen:
+\item Commit changes:
   \begin{lstlisting}
 $ git commit -m "initial commit"
   \end{lstlisting}
 %$
-\item Zum Master-Branch wechseln und zusammenführen
+\item Change and merge branch
   \begin{lstlisting}
 $ git checkout master
 $ git merge ticket-53
   \end{lstlisting}
-Wenn dabei keine Konflikte auftreten, werden die Änderungen
-automatisch in das Repository übertragen.
-\item Löschen des Branches
+  If there are no conflicts, the changes will be transferred into the
+  repository.
+%Wenn dabei keine Konflikte auftreten, werden die Änderungen
+%automatisch in das Repository übertragen.
+\item Delete branch
   \begin{lstlisting}
 $ git branch -d ticket-53
   \end{lstlisting}
@@ -532,12 +556,13 @@ $ git branch -d ticket-53
 \end{itemize}
 %
 \newslide
-\subsection{Konfliktbehandlung}
-Wenn 2 oder mehr Entwickler ihre Änderungen in ein gemeinsames
-Remote-Repository übertragen, oder 2 oder mehr Branches zusammengefügt
-werden, kann es zu Konflikten kommen.
+\subsection{Conflicts}
+A conflict could occur if 2 or more developers work on the same file(s).
+%Wenn 2 oder mehr Entwickler ihre Änderungen in ein gemeinsames
+%Remote-Repository übertragen, oder 2 oder mehr Branches zusammengefügt
+%werden, kann es zu Konflikten kommen.
 
-Beispiel:
+Example:
 \begin{lstlisting}[escapechar=\%]
 $ %{\bfseries git push origin master}%
 To file:///var/git/project1.git
@@ -549,91 +574,30 @@ Merge the remote changes (e.g. 'git pull') before pushing again.  See the
 \end{lstlisting}
 %$
 \newslide
-Nach einem Git-Pull können folgende Meldungen angezeigt werden:
+After a \verb|git pull| the following messages could be displayed:
+%Nach einem Git-Pull können folgende Meldungen angezeigt werden:
 \begin{lstlisting}
 Auto-merging <filename>
 CONFLICT (content): Merge conflict in <filename>
 Automatic merge failed; fix conflicts and then commit the result
 \end{lstlisting}
-Die Konfliktstellen der betreffenden Dateien sind
-ähnlich wie bei Subversion markiert mit den Zeilen
+The lines with conflicts will be marked in the file:
+%Die Konfliktstellen der betreffenden Dateien sind
+%ähnlich wie bei Subversion markiert mit den Zeilen
 \begin{lstlisting}
 <<<<<<<
 =======
 >>>>>>>
 \end{lstlisting}
-Diese Stellen müssen korrigiert werden, bevor man die Änderungen per
-commit übertragen kann.
+These conflicts needs to be fixed manually.
+%Diese Stellen müssen korrigiert werden, bevor man die Änderungen per
+%commit übertragen kann.
 % Bei
 % der Bezeichnung project1.git handelt es sich eine Namenskonvention.
 %
 % http://www.thomas-krenn.com/de/wiki/Git_Workflows
 \newslide
-\subsection{Verteilte Repositories: Workflow}
-Source: \href{http://git-scm.com/book/en/Distributed-Git-Distributed-Workflows}
-  {Distributed-Git-Distributed-Workflows}
-\begin{itemize}
-\item Zentralisierter Workflow:
-\begin{center}
-\includegraphics[width=0.6\linewidth]{config-management/git-centralized-wf}
-\end{center}
-\newslide
-\item Integration-Manager-Workflow:
-\begin{center}
-\includegraphics[width=0.75\linewidth]{config-management/git-integration-wf}
-\end{center}
-\newslide
-\item Diktator und Leutnant:
-\begin{center}
-\includegraphics[width=0.75\linewidth]{config-management/git-dictator-wf}
-\end{center}
-\end{itemize}
-% http://git-scm.com/book/en/Distributed-Git-Distributed-Workflows
-\newslide
-\subsection{Gitflow Workflow (Vincent Driessen)}
-Source: \href{http://nvie.com/posts/a-successful-git-branching-model}
-  {nvie.com/posts/a-successful-git-branching-model}
-\begin{center}
-\includegraphics[width=0.6\linewidth]{config-management/gitflow}
-\end{center}
-% https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
-%
-% git branch develop
-% git push -u origin develop
-%
-% git checkout -b develop origin/develop
-% git checkout -b feature/jgitflow develop
-% ..
-% git commit -m
-% git pull origin develop
-% git checkout develop
-% git merge feature/jgitflow
-% git push
-% git branch -d feature/jgitflow
-\newslide
-%\section{Github, Gitlab, Bitbucket}
 
-\subsection{Software und weitere Informationen}
-\begin{itemize}
-\item Git Projekt-Seite: \href{http://git-scm.com/}{git-scm.com}
-\item Git Tutorials: \href{http://www.gitguys.com}{www.gitguys.com},
-   \href{https://www.atlassian.com/git/tutorials}{www.atlassian.com/git/tutorials}
-\item 8 ways to share your git repository (Patrick Debois):\\
-  \href{http://agile.dzone.com/news/8-ways-share-your-git}
-   {}http://agile.dzone.com/news/8-ways-share-your-git
-\item Git Workflows \href{https://www.atlassian.com/git/workflows}
-         {www.atlassian.com/git/workflows}
-\item Pro Git (Benutzeranleitung)
-  \href{http://progit.org/book}{progit.org/book}
-\item Git Reference: \href{http://gitref.org}{gitref.org}
-\item Git -- Verteilte Versionsverwaltung für Code und Dokumente,
-(V. Haenel, J. Plenz, Open Source Press, 2011)
-\href{http://gitbu.ch}{gitbu.ch}
-\item Eclipse-Plugin EGit:
-  \href{http://www.eclipse.org/egit}{www.eclipse.org/egit}
-\item TortoiseGit: \href{http://code.google.com/p/tortoisegit}
-    {code.google.com/p/tortoisegit}
-\end{itemize}
 %
 %http://www.kernel.org/pub/software/scm/git/docs/everyday.html
 %
@@ -675,14 +639,33 @@ everything is correct.
 % patch -p0 -i ~/milestone2.patch
 % patch -p0 -i ~/milestone3.patch
 \newslide
+
 \section{Software and further Informations}
 \begin{itemize}
-\item Konfigurationsmanagement mit Subversion,
-  Ant und Maven (Gunther Popp) dpunkt.verlag, 2008
+\item Git project: \href{http://git-scm.com/}{git-scm.com}
+\item Git tutorials: \href{http://www.gitguys.com}{www.gitguys.com},
+   \href{https://www.atlassian.com/git/tutorials}{www.atlassian.com/git/tutorials}
+\item 8 ways to share your git repository (Patrick Debois):\\
+  \href{http://agile.dzone.com/news/8-ways-share-your-git}
+   {}http://agile.dzone.com/news/8-ways-share-your-git
+\item Git Workflows \href{https://www.atlassian.com/git/workflows}
+         {www.atlassian.com/git/workflows}
+\item Pro Git (Benutzeranleitung)
+  \href{http://progit.org/book}{progit.org/book}
+\item Git Reference: \href{http://gitref.org}{gitref.org}
+\item Git -- Verteilte Versionsverwaltung für Code und Dokumente,
+(V. Haenel, J. Plenz, Open Source Press, 2011)
+\href{http://gitbu.ch}{gitbu.ch}
+\item Eclipse-Plugin EGit:
+  \href{http://www.eclipse.org/egit}{www.eclipse.org/egit}
+\item TortoiseGit: \href{http://code.google.com/p/tortoisegit}
+    {code.google.com/p/tortoisegit}
+\item Configuration management with Subversion,
+  Ant and Maven (Gunther Popp) dpunkt.verlag, 2008
 \label{lit:popp}
 %\item CVS
 %\begin{itemize}
-%\item Die offizielle CVS-Projektseite:
+%\item CVS Project:
 %  \href{http://savannah.nongnu.org/projects/cvs/}
 %    {savannah.nongnu.org/projects/cvs/}
 %\item Open Source Development with CVS:
@@ -694,7 +677,7 @@ everything is correct.
 %\item Mehrere graphische Frontends für CVS:
 %  \href{http://www.wincvs.org}{www.wincvs.org}
 %\end{itemize}
-\item Weitere Versionsverwaltungs-Tools:
+\item Additional versioning tools:
 \begin{itemize}
 \item Mercurial: \href{http://mercurial.selenic.com/}{mercurial.selenic.com}
 \item Monotone:
