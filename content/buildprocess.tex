@@ -293,66 +293,59 @@ should contain the following targets:
 \newpage
 
 \section{Maven}
-Wie Ant ist auch Maven ein Open-Source-Werkzeug zur einfachen Automatisierung von
-Build-Prozessen.
 
-\ifslides
-Vorteile:
+Apache Maven is a software project management and comprehension tool.
+Based on the concept of a project object model (POM), Maven can manage a
+project's build, reporting and documentation from a central piece of
+information.\\
+Maven’s primary goal is to allow a developer to comprehend the
+complete state of a development effort in the shortest period of
+time. In order to attain this goal, Maven deals with several areas
+of concern:
 \begin{itemize}
-\item Reduzierter Konfigurationsaufwand:
-       {\em deklarativ} statt {\em imperativ}, Convention over Configuration
-\item Paket-Management mit Versionierung: Repository für Libraries
-\item Einheitlicher Build-Prozess mit Standardverzeichnisstruktur
-\item IDE-Unabhängigkeit: Unterstützung von Eclipse, Netbeans, Intellij
+\item Making the build process easy\\
+While using Maven doesn’t eliminate the need to know about the underlying mechanisms, Maven does shield developers from many details.
+\item Providing a uniform build system\\
+Maven builds a project using its project object model (POM) and a set of plugins. Once you familiarize yourself with one Maven project, you know how all Maven projects build. This saves time when navigating many projects.
+\item Providing quality project information\\
+Maven provides useful project information that is in part taken from your POM and in part generated from your project’s sources. For example, Maven can provide:
+\begin{itemize}
+\item Change log created directly from source control
+\item Cross referenced sources
+\item Mailing lists managed by the project
+\item Dependencies used by the project
+\item Unit test reports including coverage
 \end{itemize}
-\else
-Im Unterschied zu Ant basiert Maven jedoch auf einem
-{\em deklarativen} anstelle eines {\em imperativen} Ansatzes:
-man beschreibt {\em was} und
-nicht {\em wie} man etwas tun will. Die Folge davon ist ein
-wesentlich geringerer Konfigurationsaufwand.
-Zusätzlich orientiert sich Maven am Prinzip ``Convention over
-Configuration'': hält man sich an die von Maven vorgeschlagene
-Verzeichnisstruktur, vereinfacht sich die Konfiguration entsprechend.
+Third party code analysis products also provide Maven plugins that add their reports to the standard information given by Maven.
+\item Encouraging better development practices\\
+Maven aims to gather current principles for best practices development and make it easy to guide a project in that direction.\\
+For example, specification, execution, and reporting of unit tests are part of the normal build cycle using Maven. Current unit testing best practices were used as guidelines:
+\begin{itemize}
+\item Keeping test source code in a separate, but parallel source tree
+\item Using test case naming conventions to locate and execute tests
+\item Having test cases setup their environment instead of customizing the build for test preparation
+\end{itemize}
+Maven also assists in project workflow such as release and issue management.\\
+Maven also suggests some guidelines on how to layout your project’s directory structure. Once you learn the layout, you can easily navigate other projects that use Maven.\\
+While takes an opinionated approach to project layout, some projects may not fit with this structure for historical reasons. While Maven is designed to be flexible to the needs of different projects, it cannot cater to every situation without compromising its objectives.
+\end{itemize}
 
-Eine weitere wertvolle Eigenschaft von Maven ist die Fähigkeit
-die verwendeten Bibliotheken (sog. Artefakte) zu verwalten.
-Maven holt sich bei Bedarf
-die benötigten Archivdateien vom Internet herunter und legt sie
-in ein zentrales Repository.
-
-Von Haus aus bringt Maven bereits
-einen Standard-Build-Prozess mit und etabliert damit
-eine einheitliche Projektstruktur. Auch dies ein nicht zu
-unterschätzender Vorteil. Ausserdem kann Maven unabhängig von einer IDE
-benutzt werden, es unterstützt aber auch die
-Entwicklungsumgebungen Eclipse, Netbeans und Idea.
-
-Die erste Version von Maven, die 2002 in relativ kurzer Zeit
-eingeführt wurde, wies noch einige Unzulänglichkeiten
-auf. Mittlerweile ist eine in wesentlichen Teilen erneuerte und
-verbesserte Version 2 (resp. 3) verfügbar. Diese Versionsproblematik
-kann jedoch auf einigen Internet-Seiten noch für etwas Verwirrung
-sorgen.
-\fi
-\newslide
 %
-\subsection{Projektmodell}
-Grundlage des Erstellungsprozesses von Maven ist das Projektmodell (POM).
-Es beschreibt die Metadaten, Abhängigkeiten und alle notwendigen
-Angaben damit Maven den entsprechenden Build-Prozess
-durchführen kann:
+\subsection{Project Object Model POM}
+The pom.xml file is the core of a project's configuration in Maven.
+It is a single configuration file that contains the majority of
+information required to build a project in just the way you want.\\
+The most important information is:
 \begin{itemize}
-\item \structure{Allgemeine Angaben}: Projektkoordinaten, Verpackungsart \ldots
-\item \structure{Dependencies}: Abhängigkeiten zu externen Bibliotheken,
-\item Build: spezielle Angaben zum Build-Prozess (plugins),
-\item Properties: projekt-spezifische Konstanten,
-\item Profile: Build-Varianten,
-\item Repositories: spezielle Verzeichnisse für die verwendeten
-  Bibliotheken und Plugins,
-\item Reporting: Projektdokumentation
+\item \structure{General information}: Project information, Package \ldots
+\item \structure{Dependencies}: Dependencies to external libraries,
+\item \structure{Build}: information for the build process (plugins),
+\item \structure{Properties}: project specific properties (e.g. Java version),
+\item \structure{Profile}: Build variants (e.g. PROD, DEV, TST),
+\item \structure{Repositories}: 3rd party repositories
+\item Reporting: Documentation
 \end{itemize}
-Diese Angaben werden in der XML-Datei pom.xml abgelegt. Beispiel:
+All information is stored in a file called \verb|pom.xml|:
 \begin{lstlisting}[language=xml,
    morekeywords={modelVersion,groupId,artifactId,
    packaging,version,name,url,dependencies,dependency,scope,project}]
@@ -371,32 +364,41 @@ Diese Angaben werden in der XML-Datei pom.xml abgelegt. Beispiel:
   <url>http://maven.apache.org</url>
 
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-engine</artifactId>
+    <version>5.7.1</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-api</artifactId>
+    <version>5.7.1</version>
+    <scope>test</scope>
+  </dependency>
   </dependencies>
 </project>
 \end{lstlisting}
 \newslide
-Die allgemeinen Angaben werden mit den folgenden Elementen beschrieben:
+General information will be described in the following way:
+%Die allgemeinen Angaben werden mit den folgenden Elementen beschrieben:
 \begin{itemize}
-\item \structure{groupId}: der eindeutige Bezeichner der Projektorganisation
-  (meist ein DNS-Bezeichner, z.B. org.apache.maven)
-\item \structure{artifactId}: der eindeutige Bezeichner des erzeugten
-  Ergebnisses, z.B: myapp
-\item \structure{version}: die Version des Artefaktes
-\item \structure{packaging}: die Verpackungsart des Artefaktes
-\item \structure{name}: der in der Dokumentation verwendete Projektbezeichner
-\item \structure{url}: die Web-Seite des Projektes
+\item \structure{groupId}: unique identifier of the project organization, e.g. ch.fhnw.mscmi
+\item \structure{artifactId}: unique identifier of the outcome (product)
+\item \structure{version}: version of the artifact
+\item \structure{packaging}: package type (e.g. war, jar)
+\item \structure{name}: project name for the documentation
+\item \structure{url}: website of the project
 \end{itemize}
-Unter dependencies findet man
-das junit-Artefakt, welches im Projekt für die Test-Phase
-benötigt wird. Hier können weitere Dependency-Elemente
-hinzugefügt mit Scope den jeweiligen Verwendungsbereich
- (test, compile, provided, runtime, system) vereinbart werden.
+As a dependency there is the \verb|Junit| framework listed. Other
+dependencies could be added (e.g. Apache Commons).\\
+A dependency could have a scope (test, compile, provided, runtime, system) to
+define the usage area.
+%Unter dependencies findet man
+%das junit-Artefakt, welches im Projekt für die Test-Phase
+%benötigt wird. Hier können weitere Dependency-Elemente
+%hinzugefügt mit Scope den jeweiligen Verwendungsbereich
+% (test, compile, provided, runtime, system) vereinbart werden.
 %
 % Lat. ars „Bearbeitung“ und factum „das Gemachte“
 % Artefakt:
@@ -406,46 +408,33 @@ hinzugefügt mit Scope den jeweiligen Verwendungsbereich
 \newslide
 % http://www.avajava.com/tutorials/lessons/what-are-the-phases-of-the-maven-default-lifecycle.html
 \subsection{Build-Lifecycle}
-Leicht vereinfacht ist der Build-Prozess bei Maven
-in die folgenden Phasen gegliedert:
+The build process in Maven contains the following phases:
+%Leicht vereinfacht ist der Build-Prozess bei Maven
+%in die folgenden Phasen gegliedert:
 \begin{itemize}
-\item \structure{process-resources}: Konvertierung der Ressource-Dateien,
-%(korrekte, vollständige Projektstruktur),
-\item \structure{compile}: Kompilation des Quellkodes,
-\item \structure{test}: Durchführung von Tests,
-\item \structure{package}: Verpackung der Dateien,
-\item \structure{integration-test}: Installation in eine Testumgebung zur
-  Durchführung der Integrationstests,
-\newslide
-%\item \structure{verify}: Überprüfung der Gültigkeit,
-\item \structure{install}: Installation in das lokale Maven-Repository,
-\item \structure{deploy}: Installation in die Integrations-
-                        oder Release-Umgebung,
- kopiert das Paket in das  Remote-Repository, so dass es von anderen
- Projekten verwendet werden kann,
+\item \structure{compile}: compile the source code
+\item \structure{test}: run unit tests
+\item \structure{package}: package compiled source code into the distributable format (jar, war, …)
+\item \structure{integration-test}: process and deploy the package if needed to run integration tests
+\item \structure{install}: install the package to a local repository
+\item \structure{deploy}: copy the package to the remote repository
 \end{itemize}
 %Diese Phasen werden in der dargestellten Reihenfolge durchgeführt. Das
 %heisst, wenn man zum Beispiel \verb+package+ ausführen lassen möchte,
 %werden zuerst die davor liegenden Phasen validate, compile, und test
 %ausgeführt.
 %
-Darüberhinaus stellt Maven die folgenden Funktionen bereit:
+There are additional goals available:
 \begin{itemize}
-\item \structure{clean}: löscht alle generierten Dateien,
-\item \structure{site}: erzeugt die Projekt-Dokumentation
+\item \structure{clean}: deletes all generated files
+\item \structure{site}: creates the project documentation
 \end{itemize}
 \newslide
-Abhängig vom jeweiligen Projekttyp
- sind jeder Projektphase eine Anzahl
-von Aktionen (sogenannte Goals),
-die als Maven-Plugins implementiert sind, zugeordnet.
+For the full list of each lifecycle's phases, check out the Maven Reference.
 
-Typischerweise wird der Projekttyp durch die Verpackungsart
-festgelegt: jar, war, ear oder pom sind gültige Beispiele.
+\vspace{3mm}
 
-\newslide
-Mit der JAR-Verpackung sind
-folgende 8 Phasen mit ihren Plugins und Goals verknüpft:
+To create a jar file, the following 8 phases are included:
 
 \begin{tabularx}{\linewidth}{llll}
   & Phase &  Plugin & Goal\\
@@ -461,65 +450,41 @@ folgende 8 Phasen mit ihren Plugins und Goals verknüpft:
 \end{tabularx}
 %
 \newslide
-\subsection{Vorgehen}
-Das grundsätzliche Vorgehen mit Maven wird im Folgenden anhand eines einfachen
-Java-Projektes (sog. Artefakt), welches die Bibliotheken junit und
-log4j verwendet, erläutert:
+\subsection{How to use Maven?}
+A simple example will explain how Maven could be used:
 \begin{enumerate}
-\item \underline{Erstellung der Projektstruktur:}
-  \begin{lstlisting}
-% mkdir projects
-% cd projects
-% mvn archetype:generate -Dfilter=quickstart
-  \end{lstlisting}
-  Die Ausführung kann beim ersten Mal etwas Zeit beanspruchen,
-  da dabei einige Dateien in das lokale
-  Repository \verb+~/.m2/repository+ kopiert werden.
+\item \underline{Create project (based on a template):}
+\begin{lstlisting}
+mvn archetype:generate
+  -DarchetypeArtifactId=maven-archetype-quickstart
+  -DarchetypeVersion=1.4
+\end{lstlisting}
+Some information is needed to create the project. This information
+could be provided as parameters or in an interactive mode:
 
-  Mit dem Argument \verb+archetype:generate+ wird der Aktionsblock
-  \verb+generate+ des Maven-Plugins \verb+archetype+ ausgeführt.
-  Aktionsblöcke werden als Goals bezeichnet.
-
-  Jedes Artefakt ist durch seine Koordinaten eindeutig identifiziert:
   \begin{itemize}
-  \item \structure{groupId}: Paketbezeichner (Namespace), Name der Organisation
-  \item \structure{artifactId}: Projektbezeichner
-  \item \structure{version}: Versionsbezeichner,
-    Defaultwert ist: \verb+1.0-SNAPSHOT+, welcher den
-  Entwicklungsstatus bezeichnet (d.h. das Ergebnis wird kontinuierlich
-  aktualisiert).
+  \item \structure{groupId}: namespace, organization name
+  \item \structure{artifactId}: project identifier
+  \item \structure{version}: version identifier
+  \item \structure{package}: default package
   \begin{figure}[H]
   \begin{center}
   \includegraphics[width=0.65\linewidth]{config-management/major-minor}
   \end{center}
-  \caption{Format des Versionsbezeichners (Source: Better Builds mit Maven)}
+  \caption{Format of the version identifier (Source: Better Builds with Maven)}
   \end{figure}
 \newslide
-Beispiele gültiger Versionsbezeichner:
+Examples for version identifier:
   \begin{itemize}
   \item 1.0.1-20080211.131141-1
   \item 1.0-alpha
   \item 1.0
   \end{itemize}
   \end{itemize}
-  Einige Artefakt-Beispiele:
-\begin{center}
-\begin{tabular}{lll}
-groupId & artifactId & version\\
-\hline
-junit  & junit & 3.8.1\\
-log4j & log4j & 1.2.13\\
-mysql & mysql-connector-java & 5.1.5\\
-org.springframework & spring & 2.5\\
-\end{tabular}
-\end{center}
-Weitere (aktuell gibt es einige 1000 groupIds) findet man im
-offiziellen Maven-Repository:
-\href{http://mirrors.ibiblio.org/maven2}{mirrors.ibiblio.org/maven2}
 
-\newslide
-Hiermit ist nun die in Abbildung \ref{fig:maven-dirstruct} gezeigte
-Verzeichnisstruktur entstanden.
+A project is now generated with the following file/directory structure:
+%Hiermit ist nun die in Abbildung \ref{fig:maven-dirstruct} gezeigte
+%Verzeichnisstruktur entstanden.
 \begin{figure}[H]
   \centering
 \ifslides
@@ -527,32 +492,35 @@ Verzeichnisstruktur entstanden.
 \else
   \includegraphics[width=0.4\linewidth]{config-management/maven-dirstruct}
 \fi
-  \caption{Verzeichnisstruktur eines Maven-Projektes}
+  \caption{Directory structure of a Maven project}
   \label{fig:maven-dirstruct}
 \end{figure}
 \newslide
-Mit archetype:generate wird eine Auswahl möglicher Projektvorlagen präsentiert, die mit dem Argument -Dfilter
-eingegrenzt werden kann.
+The available project templates could be displayed with the command
+\verb|archetype:generate|. The option \verb|-Dfilter| could be used search
+for specific templates.
+%Mit archetype:generate wird eine Auswahl möglicher Projektvorlagen präsentiert, die mit dem Argument -Dfilter
+%eingegrenzt werden kann.
 %
 \newslide
-\item \underline{Compilieren und Testen}
-
-Man kann nun auf der Kommandozeile die Aktionen einer bestimmten Projektphase
-ausführen. Zum Beispiel:
+\item \underline{Compile and Test}
+A specific project phase could now be executed on command line:
 \begin{lstlisting}
-  % mvn test
+  mvn test
 \end{lstlisting}
-Hiermit werden ohne weiteres Zutun die Aktionen aller Phasen bis und
-mit der Test-Phase durchgeführt, d.h. es werden die benötigten
-Bibliotheken, sofern
-nicht vorhanden, heruntergeladen,
-die Dateien kompiliert und anschliessend die Unit-Tests
-durchgeführt. Dazu werden die Standard-Plugins von Maven verwendet, die
-beispielsweise bei Java-Code den Java-1.5-Compiler verwenden.
-\newslide
-Will man jedoch
- spezifische Compiler-Flags benutzen, muss dies dem
- Plugin \verb+maven-compiler-plugin+ mitgeteilt werden:
+All phases from start to \verb|test| will now be executed. That means:
+\begin{itemize}
+\item Dependencies will be solved
+\item Compile source code
+\item Execute unit tests
+\end{itemize}
+
+The Java version which is defined in the \verb|JAVA_HOME| environment
+variable will be used to execute the maven build process.
+
+\vspace{3mm}
+
+Specific compiler flags will be defined in the \verb+maven-compiler-plugin+ plugin:
 \begin{lstlisting}[language=xml,
   morekeywords={plugins,plugin,configuration,artifactId,source,target}]
   <plugins>
@@ -565,32 +533,25 @@ Will man jedoch
     </plugin>
   </plugins>
 \end{lstlisting}
-Das Plugins-Element ist Teil des Build-Elementes.
-\newslide
-\item \underline{Weitere Artefakte verwenden:}
 
-Benötigt man weitere Bibliotheken, dann müssen diese der Dependency-Liste
-  hinzugefügt werden. Beispiel:
-  \begin{lstlisting}[language=xml,
+\item \underline{Using 3rd/external party libraries}
+Additional libraries will be added to the \verb|dependencies| section:
+\begin{lstlisting}[language=xml,
     morekeywords={dependency,groupId,artifactId,version,scope}]
- <dependency>
-   <groupId>log4j</groupId>
-   <artifactId>log4j</artifactId>
-   <version>1.2.13</version>
-   <scope>compile</scope>
- </dependency>
-  \end{lstlisting}
-Das Maven-Repository kann mit
+<dependency>
+   <groupId>org.biojava</groupId>
+   <artifactId>core</artifactId>
+   <version>1.9.5</version>
+</dependency>
+\end{lstlisting}
+Searching in the Maven repository is possible on the page:
 \href{https://search.maven.org}{search.maven.org}
-%\href{http://maven.ozacc.com}{http://maven.ozacc.com} oder
-%\href{http://mvnbrowser.com}{mvnbrowser.com}
-durchsucht werden.
 
-Maven sorgt dann dafür, dass die entsprechenden Dateien in das lokale
-Repository kopiert werden.
+Maven will then download the libraries (if not already available) and
+stores the files into a local repository.
 %
 \newslide
-\item \underline{Ausführen}
+\item \underline{Running the program}
 
 Das Ausführen gehört nicht eigentlich zu den Kern-Kompetenzen von
 Maven. Mit dem Exec-Plugin kann jedoch eine Java-Applikation  wie
@@ -613,7 +574,8 @@ Das Exec-Plugin kann auch konfiguriert werden:
 </plugin>
 \end{lstlisting}
 \newslide
-\item \underline{Verpacken:}
+
+\item \underline{Package}
 
 Mit dem Parameter package erstellt Maven entsprechend der
 Packaging-Property eine Java-Archiv-Datei, die im Verzeichnis
