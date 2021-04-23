@@ -553,71 +553,59 @@ stores the files into a local repository.
 \newslide
 \item \underline{Running the program}
 
-Das Ausführen gehört nicht eigentlich zu den Kern-Kompetenzen von
-Maven. Mit dem Exec-Plugin kann jedoch eine Java-Applikation  wie
-folgt ausgeführt werden:
-\begin{lstlisting}
-mvn exec:java -Dexec.mainClass=example.App
-\end{lstlisting}
-Allfällige Argumente können mit \verb+-Dexec.args=".."+ übergeben
-werden.
+Executing a Java application does not belong to the core competencies
+of Maven. Nevertheless, there is a possibility to do that:
 
-Das Exec-Plugin kann auch konfiguriert werden:
+\begin{lstlisting}
+mvn exec:java -Dexec.mainClass=ch.fhnw.mscmi.App
+\end{lstlisting}
+Additional arguments could be passed with \verb+-Dexec.args=".."+.
+
+The exec plugin could also be configured
 \begin{lstlisting}[language=xml,
   morekeywords={plugin,groupId,artifactId,configuration,mainClass}]
 <plugin>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>exec-maven-plugin</artifactId>
   <configuration>
-    <mainClass>example.App</mainClass>
+    <mainClass>ch.fhnw.mscmi.App</mainClass>
   </configuration>
 </plugin>
 \end{lstlisting}
 \newslide
 
 \item \underline{Package}
+The package command takes the compiled code and package it in its
+distributable format, such as a JAR, WAR, EAR.\\
+Per default, the dependencies are not included. The assembly plugin could be
+used to achieve that:
 
-Mit dem Parameter package erstellt Maven entsprechend der
-Packaging-Property eine Java-Archiv-Datei, die im Verzeichnis
-target abgelegt wird. Dabei werden allerdings die abhängigen
-Archiv-Dateien nicht mit verpackt. Dies wird vielmehr vom Assembly-Plugin
-übernommen:
 \begin{lstlisting}[language=xml,
-  morekeywords={plugin,artifactId,configuration,descriptorRefs,
+  morekeywords={build,plugins,plugin,artifactId,configuration,descriptorRefs,
   descriptorRef}]
-  <plugin>
-    <artifactId>maven-assembly-plugin</artifactId>
-    <version>3.1.0</version>
-    <configuration>
-      <descriptorRefs>
-        <descriptorRef>jar-with-dependencies</descriptorRef>
-      </descriptorRefs>
-    </configuration>
-  </plugin>
+<build>
+  <plugins>
+    <plugin>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <configuration>
+        <archive>
+          <manifest>
+            <mainClass>ch.fhnw.mscmi.App</mainClass>
+          </manifest>
+        </archive>
+        <descriptorRefs>
+          <descriptorRef>jar-with-dependencies</descriptorRef>
+        </descriptorRefs>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
 \end{lstlisting}
-\newslide
-Dieses Plugin ermöglicht es zudem, das Main-Class-Attribut
-des Manifests zu definieren:
-\begin{lstlisting}[language=xml,
-morekeywords={configuration,archive,manifest,mainClass}]
-..
-    <configuration>
-      ..
-      <archive>
-        <manifest>
-          <mainClass>myapp.Main</mainClass>
-        </manifest>
-      </archive>
-      ..
-    </configuration>
- ..
-\end{lstlisting}
-% mvn npackage assembly:single
-Die Aktion (das Goal) {\bfseries assembly:single} sorgt
-für die eigentliche Erstellung der Archiv-Datei.
-Um diese Aktion
- mit der Package-Phase zu verknüpfen, muss das
-Execution-Element wie folgt konfiguriert werden:
+
+With the goal {\bfseries assembly:single} the application,
+including the dependencies, could be generated.\\
+This goal could also be combined with the package goal:
+
 \begin{lstlisting}[language=xml,
   morekeywords={executions,execution,id,phase,goals,goal}]
   <executions>
@@ -635,26 +623,23 @@ Jar-Datei, welche alle Klassen der zu diesem Artefakt abhängigen
 Archiv-Dateien enthält.
 %
 \newslide
-\item \underline{Installieren:}
+\item \underline{Install}
+Maven installs the created artefacts into the local repository. Therefore
+these artefacts are available for other projects:
 
-Maven installiert die erstellten Erzeugnisse (Artefakte) in das lokale (private)
-Repository und macht sie damit für eigene Maven-Projekte verfügbar:
 \begin{lstlisting}
   mvn install
 \end{lstlisting}
-Bei einer Jar-Datei wird der Pfadname folgt gebildet:
+The path is build up in the following way:
 \begin{verbatim}
 <groupId>/<artifactId>/<version>/<artifactId>-<version>.jar
 \end{verbatim}
-Beispiel: org/example/myapp/1.0-SNAPSHOT/myapp-1.0.SNAPSHOT.jar
+Example: org/example/myapp/1.0-SNAPSHOT/myapp-1.0.SNAPSHOT.jar
 %
 \newslide
-\item \underline{Deployment:}
-
-Beim Deployment werden die Artefakte in ein entferntes Repository
-kopiert. Dazu werden verschiedene Verfahren unterstützt: File-Copy,
-FTP und SCP/SSH.
-Zur Konfiguration dient das DistributionManagement-Element:
+\item \underline{Deployment}
+The deployment command will copy the artefacts into a remote
+repository. Several ways are supported: Copy, FTP, SCP/SSH:
 \begin{lstlisting}[language=xml,
   morekeywords={distributionManagement,repository,id,name,url}]
   <distributionManagement>
@@ -665,15 +650,14 @@ Zur Konfiguration dient das DistributionManagement-Element:
     </repository>
   </distributionManagement>
 \end{lstlisting}
-Bei FTP und SCP/SSH müssen Benutzername/Passwort resp. Public-Key in
-der benutzer-spezifischen Settings-Datei \verb+~/.m2/settings.xml+
-definiert werden.
+For FTP and SCP/SSH: Credentials (username, password, public key)
+needs to be stored in the Maven settings file: \verb+~/.m2/settings.xml+.
 \end{enumerate}
 % $
 \newslide
-\subsection{Verwendung von Property-Werten}
-Properties werden wie bei Ant für
-Werte verwendet, die an verschiedenen Stellen referenziert werden:
+\subsection{Properties}
+Like in Apache Ant, properties could be used to store values which are
+used at several positions in the pom.xml file:
 \begin{lstlisting}[language=xml,
  morekeywords={dependencies,dependency,groupId,artifactId,
    version,scope,properties,junit}]
@@ -699,15 +683,17 @@ Maven kennt eine Vielzahl implizit definierter Properties:
 System Properties & Java-System-Properties: os.name, java.home \ldots\\
 \end{tabularx}
 \newslide
-\subsection{Erstellungsvarianten mit Build-Profiles}
-Mit Hilfe des Profile-Elementes können unterschiedliche
-Erstellungsvarianten konfiguriert werden:
+\subsection{Build Profiles}
+With the help of profiles, several different builds could be defined (e.g. PROD, TST, DEV):
 \begin{lstlisting}[language=xml,
   morekeywords={profiles,profile,id,build,plugins,plugin,artifactId,
     configuration,debug,optimize}]
   <profiles>
     <profile>
       <id>production</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <build>
 	<plugins>
           <plugin>
@@ -722,8 +708,8 @@ Erstellungsvarianten konfiguriert werden:
     </profile>
   </profiles>
 \end{lstlisting}
-Ein bestimmtes Profile kann mit Angabe des Id-Bezeichners bei der
-Ausführung mit der Option -P von Maven festgelegt werden:
+To run a specific profile, the option -P could be used when starting the
+Maven process:
 \begin{lstlisting}
   mvn -Pproduction compile
 \end{lstlisting}
