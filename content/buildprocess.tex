@@ -669,18 +669,19 @@ used at several positions in the pom.xml file:
   </dependencies>
 
 <properties>
-  <junit.version>3.8.1</junit.version>
+  <junit.version>5.7.1</junit.version>
 </properties>
 \end{lstlisting}
 % $
 \newslide
-Maven kennt eine Vielzahl implizit definierter Properties:
+There are some implicit properties available in any Maven project
+these implicit properties are:
 
 \begin{tabularx}{\linewidth}{lX}
-\verb+project.*+ & Elemente des POM: project.name, project.version\\
-\verb+settings.*+ & Benutzerabhängige Maven-Setting-Elemente\\
-\verb+env.*+ & Umgebungsvariablen: env.M2\_HOME, env.PATH \\
-System Properties & Java-System-Properties: os.name, java.home \ldots\\
+\verb+project.*+ & Maven Project Object Model (POM). You can use the \verb|project.*| prefix to reference values in a Maven POM.\\
+\verb+settings.*+ & You use the \verb|settings.*| prefix to reference values from your Maven Settings in \verb|~/.m2/settings.xml|.\\
+\verb+env.*+ & Environment variables like \verb|PATH| and \verb|M2_HOME| can be referenced using the \verb|env.*| prefix.\\
+System Properties & Any property which can be retrieved from the \verb|System.getProperty()| method can be referenced as a Maven property.\\
 \end{tabularx}
 \newslide
 \subsection{Build Profiles}

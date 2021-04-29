@@ -5,47 +5,39 @@
 %
 \chapter{Testing Tools}
 \begin{tabularx}{\linewidth}{l|X}
- Unit-Test-Framework & vereinfacht die Erstellung und Durchführung von
- Unit-Tests\\
- Automatische Durchführung  & nach einmal erfolgter Festlegung der Testfälle
-   können Funktions- und Systemtests ohne Benutzereingriffe wiederholt
-  durchgeführt werden(Record/Playback).\\
-Programmkode-Analysen & \"Uberwachung der Komplexität
-  und Standardkonformität des Programmkodes (Code-Analyzers).\\
- Messungen des Abdeckungsgrads & Erfassung der Programmblöcke, die durch
-  die Testfälle durchlaufen resp. nicht durchlaufen werden
- (Coverage-Analyzers).\\
-\end{tabularx}
-\newslide
-\begin{tabularx}{\linewidth}{l|X}
- Speicheranalyse & Anzeige nicht-initialisierter
-   Speicherbereiche, der \"Uberschreitung von Bereichsgrenzen und unkorrekter
-   Freigabe von Speicherblöcken (Memory-Analyzers)\\
- Messungen des Lastverhaltens & Untersuchung des
-  Verhaltens bei unterschiedlicher Anzahl gleichzeitiger Transaktionen
-  und/oder Datenmengen (load/performance test).\\
- Web-Tests& \"Uberprüfung der Sicherheit, der Gültigkeit von Links und
-  der Korrektheit von HTML-Kode von web-basierten Systemen\\
- Management und Dokumentation & Test-Planung und -dokumentation \\
+ Unit-Test-Framework & supports the creation and execution of unit tests\\
+ Automatic execution  & After definition and implementation of a set of
+ test cases, these test cases could be repeated in an automatic fashion,
+ without having any user interaction (repeat/playback).\\
+Source code analysis & Monitoring complexity and compliance with coding
+conventions.\\
+Coverage reports & Create a report with the information about how much of the
+code is covered with a unit test.\\
+Memory analysis & Analyzing the memory usage of the software.\\
+ Load test & Analyze the behavior of the system with a different number of
+ simultaneous executed operations (load/performance test).\\
+ Web tests & Checking functionality, usability, security,
+ compatibility and performance of web application.\\
+ Management and documentation & Test planning and documentation \\
 \end{tabularx}
 \newpage
-\section{Statische Code-Analyse}
-Statische Code-Analyse-Werkzeuge analysieren den
- Source-, resp. Byte-Code nach bestimmten Regeln
-ohne ihn auszuführen.
+\section{Source code analysis}
+Source code analysis is one of the most thorough methods
+available for auditing software. A scanner is used to find
+potential trouble spots in source code, and then these spots are
+manually audited for security concerns.
 
-Typische Kategorien sind:
+Typical categories are:
 \begin{itemize}
-\item Einhaltung von Programmier-Richtlinien (Code Conventions)
-\item Nullpointer-Dereferenzierung
-\item Objekt-Vergleiche
-\item Equal/Hashcode-Mismatch
-\item Performance-Probleme
-\item Nicht verwendete lokale Variable, Parameter und private Methoden
-\item Duplizierter Code
+\item Compliance with coding guidelines (code conventions)
+\item Object comparison
+\item Equals / hashcode issues
+\item Performance issues
+\item Unused local variables, methods, parameters
+\item Duplicated code
 \end{itemize}
 %
-Beispiel Findbugs:
+Example Findbugs:
 \ifslides
 \includegraphics[width=\linewidth]{qm/findbugs}
 \else
@@ -58,33 +50,25 @@ Beispiel Findbugs:
 %
 \newslide
 \subsection{Checkstyle}
-Mit Checkstyle kann die Einhaltung von Programmier-Richtlinien (Code
-Conventions) überprüft werden. Nach Bedarf kann Checkstyle an spezifische
-Anforderungen angepasst werden. Als Vorlage kann dazu die mitgelieferte
-XML-Konfigurationsdatei sun\_checks.xml, die die Java-Programmier-Richtlinien
-von Sun enthält, dienen.
-
-\ifslides
-\newpage
-\fi
-Checkstyle kann in allen gängigen Entwicklungsumgebungen integriert
- werden. Auch ein unabhängiger Betrieb ist möglich:
+Checkstyle is a development tool to help programmers write Java
+code that adheres to a coding standard. It automates the process
+of checking Java code to spare humans of this boring (but important)
+task. This makes it ideal for projects that want to enforce a
+coding standard.\\
+Checkstyle could be integrated in all major development environments
+(e.g. IntelliJ, Eclipse, Netbeans). It is also possible to use
+Checkstyle as an independent tool:
  \begin{lstlisting}[language=csh]
 % java -jar checkstyle-all-4.4.jar \
      -c checkstyle-4.4/sun_checks.xml
      -r src/
  \end{lstlisting}
-Hier sollen die im src-Verzeichnis und darunter liegenden Dateien mit den
- Regeln von sun\_checks.xml überprüft werden.
+ In this example the code located in the \verb|src| directory will be
+ checked against the rules defined in the \verb|sun_checks.xml| file.
 
-Auf Gentoo:
- \begin{lstlisting}[language=csh]
-% checkstyle \
-     -c /usr/share/checkstyle/checks/sun_checks.xml \
-     -r src/
- \end{lstlisting}
-\newslide
-oder als Ant-Task:
+ \vspace{3mm}
+
+With Ant:
 \begin{lstlisting}[language=xml]
   <target name="checkstyle">
     <checkstyle config="checkstyle-4.4/sun_checks.xml">
@@ -92,8 +76,10 @@ oder als Ant-Task:
     </checkstyle>
   </target>
 \end{lstlisting}
-\newslide
-Mit Maven:
+
+\vspace{3mm}
+
+With Maven:
 \begin{lstlisting}[language=xml,
   morekeywords={reporting,plugins,plugin,groupId,artifactId,configuration}]
   <reporting>
@@ -107,7 +93,8 @@ Mit Maven:
   </reporting>
 \end{lstlisting}
 \newpage
-Beispiel:
+
+Example:
 \begin{figure}[H]
 \includegraphics[width=\linewidth]{qm/checkstyle}
 \caption{Checkstyle-Eclipse-Plugin}
@@ -115,58 +102,51 @@ Beispiel:
 %
 \newslide
 \section{Assertions}
-Mit der Anweisung \verb+assert+ können
-bestimmte Bedingungen und Zustände überprüft werden:
+An assertion is a statement in Java which ensures the correctness of
+any assumptions which have been done in the program. When an assertion
+is executed, it is assumed to be true. If the assertion is false,
+the Java Virtual Machine will throw an Assertion error. It finds it application
+primarily in the testing purposes. Assertion statements are used
+along with boolean expressions.
+
 \begin{lstlisting}[language=java, morekeywords={assert}]
   double d = 4 * a * c - b*b;
   assert d >= 0 : "Negative Value";
   double x1 = sqrt( d );
 \end{lstlisting}
-Das Programm überprüft die Bedingung \verb+d >= 0+ und führt die nachfolgende
-Anweisung aus, wenn sie erfüllt ist. Andernfalls wird eine Ausnahme des Typs
-AssertionError ausgelöst. Im Gegensatz zu einer if-Anweisung verbessern
-Assertions  die Lesbarkeit, und da sie sich zur Laufzeit wahlweise ein
-oder ausschalten lassen, ist ihr Einfluss auf das
- Laufzeitverhalten, wenn sie deaktiviert sind, vernachlässigbar.
-\ifslides
-\newpage
-\fi
-Assertions müssen beim Programmaufruf explizit aktiviert werden:
+
+By default, assertions are disabled in Java. In order to enable them we use
+the vm parameter \verb|ea|:
+
 \begin{lstlisting}[language=csh]
 % java -ea AssertionTest
 \end{lstlisting}
-Beim Kompilieren muss darauf geachtet werden, dass die Option
-\verb+-source 1.4+ verwendet wird. In Eclipse betrifft dies
-die folgenden Einstellungen:
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.5\linewidth]{qm/assertion-eclipse}
-\caption{Java-Compiler-Einstellungen bei Eclipse}
-\end{figure}
-Ausserdem muss die Run-Configuration das VM-Argument \verb+-ea+ enthalten.
-
-Assertions werden hauptsächlich zur Sicherstellung von sogenannten Pre- und
-Postconditions eingesetzt, also Bedingungen, die bei Beginn oder am Ende einer
-Methode erfüllt sein müssen (Invariante). Sie sollten zur Detektion von
-Programmfehlern verwendet werden. Sie bilden so ein nützliches Hilfsmittel für
-die Fehlersuche.
 %
 \newslide
 \section{Logging und Tracing}
-Unter Logging und Tracing versteht man die Aufzeichnung von
-Ereignissen und Daten während der Ausführung eines Programmes.
-Entwicklern und Betreibern dienen diese Informationen zur
+A large part of software developers lives are monitoring,
+troubleshooting and debugging.\\
+The possibility to reproduce a bug on the local development
+machine makes it easier to find the root cause. A debugger
+could be used to walk through the code, step by step.\\
+If it is not possible to reproduce the bug on the local
+development environment makes it very hard.\\
+Proper logging makes this a much easier and smoother process.\\
+There are several reasons for logging:
+
 \begin{itemize}
-\item zur Problembehebung
-\item zum Monitoring: Überwachung des Systemverhaltens (Performance,
-      Ressourcenbedarf etc.)
-\item zum Auditing: Qualitätssicherung, Sicherheit, Zuverlässigkeit
+\item Error handling
+\item Monitoring
+\item Auditing
 \end{itemize}
-Ein Quasi-Standard und Klassiker für Logging-Aufgaben
-ist im Rahmen des Apache-Projekts Log4J entstanden.
-\newpage
- Beispiel:
+
+Statements like \verb|System.out.println()| should not be used. There
+are frameworks available for that. A very popular one is Apache Log4J.
+
+\vspace{3mm}
+
+Example:
 \begin{lstlisting}[language=java]
 package drawing;
 import org.apache.log4j.Logger;
@@ -183,97 +163,79 @@ public class Scribble{
   }
 }
 \end{lstlisting}
-Für das Logging von Exceptions empfiehlt sich folgendes Muster:
-\begin{lstlisting}[language=java]
-  try {
-	    ....
 
-   } catch (SomeException e) {
-	    log.error("Exception Message", e);
-			// show stack strace in log output
-   }
-\end{lstlisting}
-\subsection{Konfiguration}
-Die Anzeige der Meldungen, ihr Format und wohin diese letztendlich
-geschrieben (File, Console, Mail, Datenbank ..) werden sollen, kann zur
-Laufzeit festgelegt werden. Die entsprechenden
-Informationen werden in die Konfigurationsdatei \verb+log4j.properties+
-geschrieben:
-\begin{lstlisting}[escapechar=@]
-# Set root category priority to INFO and its only appender to CONSOLE.
-log4j.rootCategory=INFO, @\colorbox{yellow}{CONSOLE}@
-#log4j.rootCategory=INFO, CONSOLE, LOGFILE
 
-# Set the scribble logger category to FATAL
-log4j.logger.drawing.Scribble=FATAL
 
-# CONSOLE is set to be a ConsoleAppender using a PatternLayout.
-log4j.appender.@\colorbox{yellow}{CONSOLE}@=org.apache.log4j.ConsoleAppender
-log4j.appender.@\colorbox{yellow}{CONSOLE}@.Threshold=INFO
-log4j.appender.@\colorbox{yellow}{CONSOLE}@.layout=org.apache.log4j.PatternLayout
-log4j.appender.@\colorbox{yellow}{CONSOLE}@.layout.ConversionPattern=%l - %m%n
+\subsection{Configuration}
+The display of the messages, the format and the target (file, console, mail,
+database, ...) will be defined in a configuration file. This file
+is called \verb|log4j2.xml| and should be placed in the classpath
+of the project.
 
-# LOGFILE is set to be a File appender using a PatternLayout.
-log4j.appender.LOGFILE=org.apache.log4j.FileAppender
-log4j.appender.LOGFILE.File=scribble.log
-log4j.appender.LOGFILE.Append=true
-log4j.appender.LOGFILE.Threshold=INFO
-log4j.appender.LOGFILE.layout=org.apache.log4j.PatternLayout
-log4j.appender.LOGFILE.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
-\end{lstlisting}
-Diese Datei muss zur Ausführungszeit in einem der im CLASSPATH angegeben
-Verzeichnisse abgelegt werden.
-
-\newslide
-Als Alternative zur Properties-Datei bietet sich die Konfiguration mit
-XML an (log4j.xml):
 \begin{lstlisting}[language=xml]
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
-<log4j:configuration>
-  <appender name="stdout"
-            class="org.apache.log4j.ConsoleAppender">
-    <layout class="org.apache.log4j.PatternLayout">
-       <param name="ConversionPattern"
-              value="%d %-5p %l - %m%n"/>
-    </layout>
-  </appender>
-
-  <logger name="drawing">
-    <level value="debug" />
-      <appender-ref ref="stdout"/>
-  </logger>
-
-  <root>
-    <priority value="warn" />
-    <appender-ref ref="stdout"/>
-  </root>
-
-</log4j:configuration>
+<Configuration status="DEBUG">
+    <Appenders>
+        <Console name="LogToConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern=
+            "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="LogToFile" fileName="logs/app.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="ch.fhnw" level="debug" additivity="false">
+            <AppenderRef ref="LogToFile"/>
+            <AppenderRef ref="LogToConsole"/>
+        </Logger>
+        <Logger name="org.springframework.boot" level="error"
+        additivity="false">
+            <AppenderRef ref="LogToConsole"/>
+        </Logger>
+        <Root level="error">
+            <AppenderRef ref="LogToFile"/>
+            <AppenderRef ref="LogToConsole"/>
+        </Root>
+    </Loggers>
+</Configuration>
 \end{lstlisting}
-Nebst den im log4j-Paket enthaltenen Appenders, die für die Ausgabe auf ein
-spezifisches Gerät besorgt sind, können auch eigene kreiert werden:
-ConsoleAppender, FileAppender, SMTPAppender, JDBCAppender, JMSAppender,
-NTEventLogAppender, SyslogAppender, SocketAppender, TelnetAppender.
-\newslide
 
-Ob eine Meldung ausgegeben oder unterdrückt wird, hängt mit der ihr
-zugeordneten Priorität und Kategorie zusammen. Wenn die Kategorie zum Beispiel
-auf die Log-Stufe INFO gesetzt ist, werden die darunter liegenden
-debug-Meldungen unterdrückt.
-Die Bedeutung der Log-Stufen:
+There are many appenders available:
+
+\begin{itemize}
+\item ConsoleAppender
+\item FileAppender
+\item SMTPAppender
+\item JDBCAppender
+\item JMSAppender
+\item NTEventLogAppender
+\item TelnetAppender
+\item SyslogAppender
+\item SocketAppender
+\end{itemize}
+
+If a message will appear depends on the defined priority.\\
+The following log levels are available:
 
 \begin{tabularx}{\linewidth}{llX}
-0 & TRACE & Detaillierte Mitteilungen \\
-1 & DEBUG & Allgemeine Mitteilungen (z.B. Funktionsaufruf mit Parametern)\\
-2 & INFO & Wichtige Informationen (z.B. Verbindungsaufbau)\\
-3 & WARN & Unerwartete Situationen (z.B. keine Daten)\\
-4 & ERROR & behebbarer Fehler (z.B. keine Zugriffsberechtigung)\\
-5 & FATAL & Kritischer Fehler, Programmabbruch\\
+0 & TRACE & Designates finer-grained informational events than the DEBUG. \\
+1 & DEBUG & Designates fine-grained informational events that are most useful to debug an application.\\
+2 & INFO & Designates informational messages that highlight the progress of the application at coarse-grained level.\\
+3 & WARN & Designates potentially harmful situations.\\
+4 & ERROR & Designates error events that might still allow the application to continue running.\\
+5 & FATAL & Designates very severe error events that will presumably lead the application to abort.\\
 \end{tabularx}
 
-Die folgenden Formatierungsanweisungen können für die Festlegung des
-Ausgabeformates verwendet werden:
+There could be more or less levels available, depending on the
+used log framework.
+The following format options are available to set up the format
+of a message:
+
+%Die folgenden Formatierungsanweisungen können für die Festlegung des
+%Ausgabeformates verwendet werden:
 
 \begin{tabularx}{\linewidth}{lX}
 \%n & newline\\
@@ -298,7 +260,7 @@ As a personal choice, we tend not to use debuggers beyond getting a stack trace
 or the value of a variable or two. One reason is that it is easy to get lost
 in details of complicated data structures and control flow; we  find stepping
 through a program less productive than thinking harder and adding output
-statements and selfchecking code at critical places. Clicking over statements
+statements and self-checking code at critical places. Clicking over statements
 takes longer than scanning the output of judiciously-placed displays. It takes
 less time to decide where to put print statements than to single-step to the
 critical section of code, even assuming we know where that is. More important,
@@ -307,134 +269,87 @@ transient.
 \end{quote}
 %
 \newslide
-\subsection{Alternativen zu Log4j}
-Es mehrere Alternativen zu Log4j. Zum Beispiel:
-\begin{itemize}
-\item \structure{java.util.logger}:
-Als Teil der Java-Standard-Edition ist das Paket sehr ähnlich wie
-log4j zu verwenden, weist jedoch bezüglich der Konfigurierbarkeit einige
- Nachteile auf. Details siehe ``Log4j vs java.util.logging''  von Joe
- Mc Namara.
+\subsection{Other frameworks}
+Together with the Spring Boot technology, the logging framework \emph{Logback}
+is avaiable.\\
+Logback is intended as a successor to the popular log4j project,
+picking up where log4j leaves off.
 
-  \href{http://java.sys-con.com/read/48541.htm}
-                {java.sys-con.com/read/48541.htm}.
-\newslide
-\item \structure{Commons-Logging}:
- Im Rahmen des Apache-Commons-Projekt wurde mit Com\-mons-Logging
-ein Wrapper-Paket entwickelt, welches
-eine Abstraktionsschicht über diese beiden Logging-Systeme anbietet und
-recht verbreitet eingesetzt wird. Von einer Verwendung wird
-jedoch abgeraten:
-``Think again before adopting the commons-logging API'' (Ceki Gülcü)
-\href{http://www.qos.ch/logging/thinkAgain.jsp}
-  {www.qos.ch/logging/thinkAgain.jsp}
-\newslide
-\item \structure{Simple Logging Facade for Java (SLF4J)}:
-Als Ersatz von Commons-Logging bietet sich mit SLF4J
-ein wesentlich verbesserter Nachfolger
-an (\href{http://www.slf4j.org}{www.slf4j.org}).
-Dieses Paket ist speziell für Entwickler von
-Java-Bib\-lio\-theken, die in unterschiedlichen Projekten eingebunden
-werden, von Interesse, da damit der Entscheid, welches Log-Modul
-verwendet werden soll, der Endanwender treffen kann.
-\newslide
-Für die Programmierer ändert sich wenig:
-\begin{lstlisting}[language=java]
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+\vspace{3mm}
 
-public class Scribble{
-  final Logger logger = LoggerFactory.getLogger(Scribble.class);
-  public Scribble(){
-    logger.trace("Entering drawing mode..");
-    logger.debug("Starting a new drawing");
-    logger.info("Connected to database");
-    logger.warn("Empty input");
-    logger.error("Permission denied");
-  }
-}
+There is a default configuration available which could be configured
+in different ways:
+
+First, we can set our logging level within our VM Options:
+
+\begin{lstlisting}
+-Dlogging.level.org.springframework=INFO
+-Dlogging.level.ch.fhnw=TRACE
 \end{lstlisting}
-Der Log-Level FATAL wurde entfernt, da er für nicht besonders nützlich
-gehalten wird.
 
-SLF4J bietet zudem verschiedene Verbesserungen an, zum Beispiel
-bei der Ausgabe von Meldungen mit Parametern:
-\begin{itemize}
-\item mit Log4J:
-  \begin{lstlisting}[language=java]
-logger.info("Temperature set to "+ newtemp +
-               " (previous "+ prevtemp+")");
-  \end{lstlisting}
-\item besser mit SLF4J (besseres Laufzeitverhalten):
-  \begin{lstlisting}[language=java]
-logger.info("Temperature set to {} (previous {})",
-           newtemp, prevtemp );
-         \end{lstlisting}
-       \end{itemize}
-\newslide
-SLF4J bietet eine Vielzahl von Möglichkeiten zur Integration bestehender
-Logging-Frameworks:
+or with Maven:
 
-\includegraphics[width=\linewidth]{qm/xfig/slf4j}
-
-\newslide
-Für Maven lauten die entsprechenden Dependency-Einträge in der POM-Datei
-für SLF4j mit Log4j:
-\begin{lstlisting}[language=xml,
-  morekeywords={dependency,groupId,artifactId,scope}]
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.1</version>
-      <scope>runtime</scope>
-    </dependency>
+\begin{lstlisting}
+mvn spring-boot:run
+  -Dspring-boot.run.arguments=
+    --logging.level.org.springframework=INFO,
+    --logging.level.ch.fhnw=TRACE
 \end{lstlisting}
-\newslide
-\item \structure{Logback}: Logback kann man als
-  eigentlichen Nachfolger von Log4J, dessen Weiterentwicklung seit
-  einiger Zeit gestoppt zu sein scheint, bezeichnen.
-Es wurde vom Logging-Spezialisten Ceki Gülcü,
-dem Gründer der Projekte Log4J und SLF4J, gestartet
-und stösst auf wachsendes Interesse.
-\href{http://logback.qos.ch}{logback.qos.ch}
-\begin{lstlisting}[language=xml,morekeywords={dependency,groupId,artifactId}]
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.0.7</version>
-</dependency>
-\end{lstlisting}
-Da Logback die SLF4J-Schnittstelle implementiert,
-gibt es im Vergleich zu SLF4J im Programmcode eigentlich keine
-Unterschiede.
-\newslide
- Die Konfiguration hingegen erfolgt in der Datei logback.xml und bietet
-zahlreiche Erweiterungen (es existiert sogar eine Grovvy-Variante):
-\begin{lstlisting}[language=xml,
-  morekeywords={configuration,appender,encoder,pattern,root}]
+
+If there is a configuration file \verb|logback.xml| in the classpath,
+the default configuration will be overwritten by that file:
+
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <appender name="STDOUT"
-            class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%d [%thread] %-5level %logger - %msg%n</pattern>
-    </encoder>
-  </appender>
+    <property name="LOGS" value="./logs" />
 
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <appender name="Console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level)
+                [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="RollingFile"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/spring-boot-logger.log</file>
+        <encoder
+            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>
+            ${LOGS}/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </root>
+
+    <logger name="ch.fhnw" level="trace" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
 </configuration>
-
-
 \end{lstlisting}
-\end{itemize}
+
 %
 \newslide
 \section{Vergleiche von Textdateien}
@@ -1344,8 +1259,8 @@ Mit Maven ist es wesentlich einfacher:
 <reporting>
   <plugins>
     <plugin>
-      <artifactId>maven-surefire-report-plugin</artifactId>
-      <version>2.12</version>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>2.22.2</version>
     </plugin>
   </plugins>
 </reporting>
@@ -1443,34 +1358,56 @@ Mit Maven ist es auch hier wesentlich einfacher:
 \fi
 %-------------------------------------------------------------------------
 \newpage
+
 \section{Continuous Integration}
-Mit dem Begriff ``Continuous Integration'' (abgekürzt CI) bezeichnet man das
-automatisierte, regelmässige und häufige Erstellen eines Softwaresystems während
-dessen Entwicklung. Damit kann auf einfachste Weise sichergestellt
-werden, dass
+\emph{Don’t break the nightly build!}
+is a cardinal rule in software development shops that post a
+freshly built daily product version every morning for their testers.
+
+\vspace{3mm}
+
+Continuous Integration is a software development practice in which
+developers are required to frequently commit changes to the
+source code in a shared repository. Each commit is then continuously
+pulled and built.\\
+The goal of Continuous Integration is to provide rapid feedback so that if
+a defect is introduced into the code base, it can be identified and
+corrected as soon as possible.\\
+That approach will ensure that:
+
+%Mit dem Begriff ``Continuous Integration'' (abgekürzt CI) bezeichnet man das
+%automatisierte, regelmässige und häufige Erstellen eines Softwaresystems während
+%dessen Entwicklung. Damit kann auf einfachste Weise sichergestellt
+%werden, dass
+
 \begin{itemize}
-\item allfällige Integrationsprobleme frühzeitig erkannt,
-\item alle benötigten Dateien eingecheckt und
-\item die vorhandenen Tests durchgeführt worden sind.
+%\item allfällige Integrationsprobleme frühzeitig erkannt,
+\item identify defects as soon as possible
+%\item alle benötigten Dateien eingecheckt und
+\item all sources are in the repository to build the system
+%\item die vorhandenen Tests durchgeführt worden sind.
+\item all available tests are executed successfully
 \end{itemize}
-Eine Voraussetzung dafür ist, dass alle beteiligten
-Entwickler ihre Arbeitsergebnisse in entsprechend kurzen Intervallen (z.B
-einmal täglich) einchecken.
-\newslide
-Ein CI-Server sorgt dafür, dass neu eingecheckter Code einem
-periodischen Build- und
-Test-Zyklus unterzogen und dessen Ergebnisse auf einer Web-Seite und
-als RSS-Feed publiziert werden.
-Es ist zudem auch möglich diese per E-Mail an ausgewählte
-Adressen zu versenden.
 
-Dieses Verfahren wird auch ``Smoke Testing'' genannt, in
-Anlehnung an das Vorgehen bei der Hardware-Entwicklung, wenn nach
-erfolgter Bestückung einer Platine Spannung angelegt wird um
-festzustellen, ob irgendwo Rauch aufsteigt.
+Important are frequent commit and push operations. Working
+many days in a row without pushing the results into the repository will
+increase the probability that something will fail.\\
+A CI server ensures, that new code in the repository will
+directly be included in the build process.\\
+It is also possible to sent out mail notifications in case of
+a successful build.\\
+This process is also called \emph{Smoke Testing}.
+Smoke Testing is a software testing process that determines whether
+the deployed software build is stable or not. Smoke testing is a
+confirmation for QA team to proceed with further software testing.
+It consists of a minimal set of tests run on each build to test
+software functionalities.
+%Dieses Verfahren wird auch ``Smoke Testing'' genannt, in
+%Anlehnung an das Vorgehen bei der Hardware-Entwicklung, wenn nach
+%erfolgter Bestückung einer Platine Spannung angelegt wird um
+%festzustellen, ob irgendwo Rauch aufsteigt.
 
-\newslide
-Bekannte Vertreter von CI-Server-Systemen sind:
+Available continuous integration systems:
 \begin{itemize}
 \item CruiseControl \href{http://cruisecontrol.sourceforge.net}
                         {cruisecontrol.sourceforge.net}
@@ -1480,120 +1417,38 @@ Bekannte Vertreter von CI-Server-Systemen sind:
 \item Continuum \href{http://continuum.apache.org}{continuum.apache.org}
 \item TeamCity  \href{http://www.jetbrains.com/teamcity}
       {www.jetbrains.com/teamcity}
+\item GitLab \href{http://www.gitlab.com}
+      {www.gitlab.com}
 %\item \ldots
 \end{itemize}
 %
 \newslide
-\subsection{CruiseControl}
-CruiseControl ist ein von ThoughtWorks in Java entwickelter
-CI-Server.
-CruiseControl kann mittels einer XML-Datei konfiguriert werden:
-\begin{lstlisting}[language=xml,
-morekeywords={cruisecontrol,project,bootstrappers,svnbootstrapper,modificationset,svn,schedule,ant}]
-<cruisecontrol>
-  <project name="connectfour">
-    <bootstrappers>
-      <svnbootstrapper
-                localWorkingCopy="projects/${project.name}" />
-    </bootstrappers>
-
-    <!-- checks for changes in SVN repository -->
-    <modificationset>
-      <svn/>
-    </modificationset>
-
-    <schedule interval="300">
-      <ant buildfile="projects/${project.name}/build.xml"/>
-    </schedule>
-..
-  </project>
-</cruisecontrol>
-\end{lstlisting}
-Hier wird beispielsweise in 5-Minuten-Intervallen das SVN-Repository
-des Projektes ``connectfour'' abgefragt und ein neuer Ant-Build
-ausgeführt, wenn sich Dateien geändert haben.
-\begin{figure}[H]
-%\includegraphics[width=\linewidth]{qm/bugkilla_cc}
-%  (\href{http://www.oio.de/cruisecontrol.htm}{www.oio.de/cruisecontrol.htm})}
-\includegraphics[width=\linewidth]{qm/cruisecontrol-dashboard}
-\caption{CruiseControl mit Dashboard}
-%
-\label{fig:cruisecontrol}
-\end{figure}
-\newslide
-Auch Maven wird unterstützt. Dazu dient das Element maven2, welches
-das Element ant in der Config-Datei ersetzt. Mit dem Attribut goal können die
-durchzuführenden Phasen angegeben werden und mit sitegoal die zu
-erstellende Dokumentation. Beispiel:
-\begin{lstlisting}[language=xml,morekeywords={maven2}]
-  <maven2 mvnhome="/usr/share/maven-bin-2.0"
-          pomfile="projects/${project.name}/pom.xml"
-	  goal="clean|install"
-	  sitegoal="site|site:deploy"
-	  flags="-B -e -Dsurefire.useFile=false -U" />
-\end{lstlisting}
-%$
-\newslide
-Die hier aufgelisteten Flags-Parameter sind den Empfehlungen von
-Brian Fox (Maven best practises
-  \href{http://www.sonatype.com}{www.sonatype.com}) entnommen.
-%(Maven best practises \href{http://www.sonatype.com/people/2009/01/maven-continuous-integration-best-practices}
-%      --> $
-\begin{center}
-\begin{tabular}{ll}
- -B & Batch-Modus (kein interaktiver Modus)\\
- -e & erzeugt Laufzeitfehlermeldungen (Stacktrace)\\
- -Dsurefire.useFile=false & Konsolenausgabe der Unittest-Meldungen\\
- -Dmaven.repo.local=xxxx & verwendet xxxx als lokales Maven-Repository\\
- -U & prüft, ob aktualisierte Releases und Snapshots vorliegen\\
-\end{tabular}
-\end{center}
-\newslide
-Interessant und sehr praktisch ist auch die Fähigkeit von CruiseControl die
-erfolgreichen Build-Artefakte zum Download gleichfalls auf der Web-Seite
-anzubieten. Dazu muss lediglich die Config-Datei mit einem entsprechenden
-Publisher-Eintrag ergänzt werden:
-\begin{lstlisting}[language=xml,
-  morekeywords={publishers,onsuccess,artifactspublisher}]
-  <publishers>
-    <onsuccess>
-      <artifactspublisher
-            dest="artifacts/${project.name}"
-	    dir="${env.HOME}/.m2/repository/net/sampleproject"/>
-      </onsuccess>
-  <publishers>
-\end{lstlisting}
-Dabei muss darauf geachtet werden, dass das Dir-Attribut auf das
-korrekte Installationsverzeichnis zeigt, und dass beim
-Maven-Buildprozess auch wirklich eine Installation durchgeführt wird.
-%
-% http://www.javaworld.com/javaworld/jw-12-2008/jw-12-hudson-ci.html
 \subsection{Jenkins}
-Jenkins wurde ursprünglich bei Sun Microsystems von Kohsuke Kawaguchi
-auf Open-Source-Basis unter dem Namen Hudson entwickelt. Nach der
-Übernahme von Oracle hat Kawaguchi das Unternehmen verlassen und das
-Projekt in Jenkins umbenannt. Obwohl Oracle Hudson ebenfalls
-weiterentwickeln will, scheint das Jenkins-Projekt breitere
-Unterstützung  zu finden.
-Es gibt zahlreiche Projekte, die Plugin-Module
-für Jenkins entwickeln und damit dessen Funktionalität erheblich
-erweitern.
+Jenkins offers a simple way to set up a continuous integration or
+continuous delivery (CI/CD) environment for almost any combination
+of languages and source code repositories using pipelines,
+as well as automating other routine development tasks.
+While Jenkins doesn’t eliminate the need to create scripts for
+individual steps, it does give you a faster and more robust way to
+integrate your entire chain of build, test, and deployment tools
+than you can easily build yourself.\\
+Jenins will be installed as a server component. You could deploy it as
+a web application (e.g. Tomcat, JBoss) or run it with the integrated
+server.\\
+The configuration of the system and the build processes are set up by
+using the web front end application.
 
-Jenkins kann auf 2 Arten betrieben werden:
-\begin{itemize}
-\item als eigenständiger Server: \verb+java -jar jenkins.war+
-\item als Web-Applikation (Glassfish, JBoss, Jetty, Tomcat, WebSphere,
-  \ldots)
-\end{itemize}
-Jenkins wird im wesentlichen mit einer Web-Oberfläche verwaltet:
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\linewidth]{qm/jenkins}
   \caption{Jenkins GUI (Quelle: J. Ferguson Smart)}
   \label{fig:jenkins}
 \end{figure}
-Als weitere Schnittstelle wird REST sowie ein
-Konsolen-Client angeboten.
+
+In addition, there is a REST interface and a command line tool
+available.
+
+\vspace{3mm}
 
 Jenkins unterscheidet die folgenden Projekt-Typen:
 \begin{itemize}
@@ -1626,6 +1481,61 @@ geschehen:
 %
 %\newpage
 \newslide
+
+\section{Memory Tests}
+It is important to know the memory consumption behavior of the
+software system. Especially to find out if there are any memory leaks.\\
+A memory leak is a type of resource leak that occurs when a computer
+program incorrectly manages memory allocations in a way that memory which
+is no longer needed is not released. After a specific amount of time,
+the system will crash with a memory exception.\\
+A hint for a memory leak is the increase of memory usage over time.\\
+There are several tools available to check for memory usage. Default
+tools are:
+
+\begin{itemize}
+\item Windows: Task Manager
+\item Linux/OSX: Top
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{qm/taskmanager}
+  \caption{Windows Task Manager}
+\end{figure}
+
+\vspace{3mm}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{qm/topcmd}
+  \caption{top command}
+\end{figure}
+
+\section{Zulu Mission Control}
+Zulu Mission Control is a build of JDK Mission Control,
+an open source Java runtime profiling and monitoring utility
+originally developed by JRockit and open source by Oracle in 2018.
+JDK Mission control was originally developed for Java 11,
+and Azul Systems has back-ported the utility to also support
+properly-configured builds of OpenJDK 8.
+
+\vspace{3mm}
+
+Zulu Mission Control will detect a running Java application and
+will be able to hook up with Java application.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{qm/zmc}
+  \caption{Zulu Mission Control}
+\end{figure}
+
+
+
+
+https://www.azul.com/products/zulu-mission-control/
+
 \section{Speichertests mit Valgrind}
 Valgrind ist ein Open-Source-Tool für das Auffinden von
 Speicher-Managementproblemen in Linux-x86-Programmen:
@@ -1815,7 +1725,7 @@ TODO: Include WEBTEST
 \newpage
 \input{content/webtest}
 %
-\section{Belastungstests mit JMeter}
+\section{Load tests with JMeter}
 Mit JMeter, einem Java-basierten, Open-Source Tool aus dem
 Apache/Jakarta-Projekt,  ist es möglich das Lastverhalten von
 Client-Server-Applikationen zu testen.
@@ -2428,7 +2338,7 @@ automatisch zu pr"ufen.
 %%\item CruiseControl: Automatisiertes Testen und Erstellen:
 \href{http://cruisecontrol.sourceforge.net}{cruisecontrol.sourceforge.net}
 
-\item Hudson: Extensible continous integration server:
+\item Hudson: Extensible continuous integration server:
 \href{http://jenkins-ci.org}{jenkins-ci.org}
 %
 \item Java Extreme Programming Cookbook (Eric M. Burke, Brian M. Coyner):
