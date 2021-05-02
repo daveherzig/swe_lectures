@@ -350,6 +350,50 @@ the default configuration will be overwritten by that file:
 </configuration>
 \end{lstlisting}
 
+In a production environment, logging is normally set to the log level
+\verb|warn| or higher. But sometimes it is needed, to change that level
+to \verb|trace| to find out the root cause of a bug/issue.\\
+If the log configuration is part of the software package means, a
+new package needs to be created. The software is exactly the same
+only the log level has changed.\\
+Therefore it would make sense to have the possibility to change
+the log level without installing a new software package.\\
+One way to achieve that is with the \verb|spring-boot-starter-actuator|
+plugin.
+
+\begin{lstlisting}[language=xml]
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+    <version>2.4.0</version>
+</dependency>
+\end{lstlisting}
+
+Starting with Spring Boot 2.x, most endpoints are disabled by
+default, so we'll also need to enable the \verb|/loggers| endpoint in
+our \verb|application.properties| file:
+
+\begin{lstlisting}
+management.endpoints.web.exposure.include=loggers
+management.endpoint.loggers.enabled=true
+\end{lstlisting}
+
+Connect to the following endpoint to see the log levels of all
+packages:
+
+\begin{lstlisting}
+http://localhost:8080/actuator/loggers
+\end{lstlisting}
+
+To following command could be used to change the log level
+during runtime:
+
+\begin{lstlisting}
+curl -i -X POST -H 'Content-Type: application/json'
+  -d '{"configuredLevel": "TRACE"}'
+  http://localhost:8080/actuator/loggers/ch.fhnw
+\end{lstlisting}
+
 %
 \newslide
 \section{Vergleiche von Textdateien}
@@ -1422,7 +1466,7 @@ Available continuous integration systems:
 %\item \ldots
 \end{itemize}
 %
-\newslide
+
 \subsection{Jenkins}
 Jenkins offers a simple way to set up a continuous integration or
 continuous delivery (CI/CD) environment for almost any combination
@@ -1466,21 +1510,63 @@ geschehen:
 \item bei Änderungen im SCM
 \item explizit
 \end{itemize}
-% John Ferguson Smart
-%\href{http://www.wakaleo.com/public_resources/continuous-integration-with-hudson.pdf}
-%\newslide
-%\subsection{Aufgabe}
-%Ein Maven-basiertes Projekt soll von einem CI-Server überwacht
-%werden.
-%Nehmen Sie ein geeignetes System in Betrieb und sorgen Sie dafür,
-%dass die Junit- und Checkstyle-Reports nach einem Build jeweils
-%angezeigt werden.
-%
-%Tipp:
-%\href{http://cruisecontrol.sourceforge.net/gettingstartedsourcedist.html#Modifying_the_HTML_Reports}{cruisecontrol.sourceforge.net/gettingstartedsourcedist.html\#Modifying\_the\_HTML\_Reports}
-%
-%\newpage
-\newslide
+
+\subsection{Gitlab CI}
+GitLab CI/CD is the part of GitLab that could be used for all of the
+continuous methods (Continuous Integration, Delivery, and Deployment).
+With GitLab CI/CD, it is possible to test, build, and publish a
+software project with no third-party application or integration needed.
+
+\subsubsection{Gitlab CI Workflow}
+GitLab CI/CD fits in a common development workflow.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\linewidth]{qm/gitlabci}
+  \caption{Gitlab CI Workflow}
+\end{figure}
+
+A file \verb|.gitlab-ci.yml| needs to be added to the project.
+The \verb|.gitlab-ci.yml| file is a YAML file where
+specific instructions for GitLab CI/CD will be configured.\\
+This file contains:
+\begin{itemize}
+\item The structure and order of jobs that the runner
+should execute.
+\item The decisions the runner should make when specific
+conditions are encountered.
+\end{itemize}
+
+Sample \verb|.gitlab-ci.yml| file:
+
+\begin{lstlisting}
+build-job:
+  stage: build
+  script:
+    - echo "Hello, $GITLAB_USER_LOGIN!"
+
+test-job1:
+  stage: test
+  script:
+    - echo "This job tests something"
+
+test-job2:
+  stage: test
+  script:
+    - echo "This job tests something, but takes more time than test-job1."
+    - sleep 20
+
+deploy-prod:
+  stage: deploy
+  script:
+    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+\end{lstlisting}
+
+\begin{lstlisting}
+
+\end{lstlisting}
+
+
 
 \section{Memory Tests}
 It is important to know the memory consumption behavior of the
@@ -1530,9 +1616,6 @@ will be able to hook up with Java application.
   \includegraphics[width=0.8\linewidth]{qm/zmc}
   \caption{Zulu Mission Control}
 \end{figure}
-
-
-
 
 https://www.azul.com/products/zulu-mission-control/
 
@@ -1726,9 +1809,24 @@ TODO: Include WEBTEST
 \input{content/webtest}
 %
 \section{Load tests with JMeter}
-Mit JMeter, einem Java-basierten, Open-Source Tool aus dem
-Apache/Jakarta-Projekt,  ist es möglich das Lastverhalten von
-Client-Server-Applikationen zu testen.
+The software application may run perfectly fine for a single user,
+but may have issues if several users access the system at the same
+time. A load test could be executed to simulate a situation will
+several users at the same time.
+
+\vspace{3mm}
+
+Apache JMeter may be used to test performance both on static and
+dynamic resources, Web dynamic applications.
+It can be used to simulate a heavy load on a server,
+group of servers, network or object to test its strength or to
+analyze overall performance under different load types.
+
+
+
+%Mit JMeter, einem Java-basierten, Open-Source Tool aus dem
+%Apache/Jakarta-Projekt,  ist es möglich das Lastverhalten von
+%Client-Server-Applikationen zu testen.
 %Nach dem Aufstarten von JMeter
 %erscheint das folgende Dialogfenster:
 %\begin{figure}[H]
