@@ -273,7 +273,7 @@ should contain the following targets:
 \begin{itemize}
 \item Java Development with Ant (Erik Hatcher, Steve Loughan), Manning
   Publications
-\item Das Apache ANT Projekt:
+\item The Apache ANT Project:
   \href{http://ant.apache.org}{ant.apache.org}
 \item Apache Ant:
   \href{http://en.wikibooks.org/wiki/Programming:Apache_Ant}
@@ -1061,3 +1061,30 @@ konfigurieren?
 \end{itemize}
 
 \newpage
+
+\section{Gradle}
+
+Gradle is a build automation tool for multi-language software development.
+It controls the development process in the tasks of compilation and
+packaging to testing, deployment, and publishing.
+Supported languages include Java (Kotlin, Groovy, Scala),
+C/C++, and JavaScript.\\
+
+Gradle builds on the concepts of Apache Ant and
+Apache Maven, and introduces a Groovy- \verb|&| Kotlin-based domain-specific
+language contrasted with the XML-based project configuration used by
+Maven. Gradle uses a directed acyclic graph to determine the order
+in which tasks can be run, through providing dependency management.\\
+
+Gradle was designed for multi-project builds, which can grow to be large.
+It operates based on a series of build tasks that can run serially or in
+parallel. Incremental builds are supported by determining the parts of
+the build tree that are already up to date; any task dependent only on
+those parts does not need to be re-executed. It also supports caching
+of build components, potentially across a shared network using the
+Gradle Build Cache. It produces web-based build visualization called
+Gradle Build Scans. The software is extensible for new features and
+programming languages with a plugin subsystem.\\
+
+Gradle is distributed as open-source software under the Apache License 2.0,
+and was first released in 2007.
